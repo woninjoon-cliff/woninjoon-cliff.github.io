@@ -223,6 +223,36 @@ section{padding:110px 0 0;scroll-margin-top:80px}
   section{padding-top:80px} .hero{min-height:auto;padding-top:36px}
   .nav .btn{display:none}
 }
+
+/* declutter 2026-10-15: 장식 걷어냄 — 유리·초대형 제목·자간 넓은 영문 라벨 제거 */
+.nav .in{background:#fff;backdrop-filter:none;-webkit-backdrop-filter:none;border-radius:12px}
+.nav .brand,.tagline,.kicker,.hs .l,.glass h3,.path .k,.bento .k,.num .l,.work .y,.chip,.tl-when,.foot,.picker .note,.stage .bar{font-family:var(--sans);letter-spacing:0;text-transform:none}
+.nav .brand{font-size:14px;font-weight:700}
+.tagline{padding:0;border:0;background:none;font-size:14px;font-weight:700;margin-bottom:16px}
+.tagline i,.kicker::before{display:none}
+.kicker{font-size:14px;font-weight:700;margin-bottom:8px}
+.hero{min-height:auto;padding:72px 0 24px}
+.hero h1{font-size:clamp(30px,4.4vw,52px);font-weight:800;line-height:1.2;letter-spacing:-.025em;max-width:none}
+.h2{font-size:clamp(24px,2.8vw,32px);font-weight:800;line-height:1.3;letter-spacing:-.02em;max-width:none}
+.quote{font-size:clamp(19px,2.2vw,24px);font-weight:700;line-height:1.5}
+.btn,.chip,.flow span,.picker button{border-radius:8px}
+.btn.pri{box-shadow:none}
+.glass,.hs,.picker button{background:#fff;backdrop-filter:none;-webkit-backdrop-filter:none;border-radius:12px}
+.glass::before{display:none}
+.glass:hover{transform:none;box-shadow:none;border-color:var(--line)}
+.glass h3{font-size:15px;font-weight:700;color:var(--ink)}
+.hs .l,.num .l{font-size:13px}
+.hs .v{font-size:28px;font-weight:800}
+.num .v{font-size:28px;font-weight:800}
+.stage{border-radius:14px;box-shadow:0 8px 24px rgba(17,24,39,.08)}
+.stage .bar i{display:none}
+.stage .bar span{margin-left:0}
+.hero-stats{margin-top:40px}
+section{padding-top:88px}
+.end{margin-top:88px;padding:44px 24px}
+.end h2{font-size:clamp(22px,2.6vw,30px);font-weight:800;letter-spacing:-.02em;line-height:1.4}
+@media (max-width:600px){.hero-stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.hs{padding:14px}.hs .v{font-size:22px}.hs .v small{display:block;margin:2px 0 0}}
+.end{border-radius:14px}
 </style>
 
 <div class="aurora" aria-hidden="true"><i class="a1"></i><i class="a2"></i><i class="a3"></i></div>
@@ -234,8 +264,8 @@ section{padding:110px 0 0;scroll-margin-top:80px}
 <div class="wrap">
 <nav class="nav" aria-label="섹션">
   <div class="in">
-    <div class="brand">WON <em>INJOON</em> · PORTFOLIO</div>
-    <ul><li><a href="#skills">Skills</a></li><li><a href="#about">About</a></li><li><a href="#project">ERP Project</a></li><li><a href="#sim">Simulator</a></li><li><a href="#works">Works</a></li><li><a href="#exp">Experience</a></li></ul>
+    <div class="brand">원인준 포트폴리오</div>
+    <ul><li><a href="#about">소개</a></li><li><a href="#project">ERP</a></li><li><a href="#sim">시뮬레이터</a></li><li><a href="#exp">경력</a></li></ul>
     <a class="btn" href="https://nosy-mustard-524.notion.site/3d058e2decc1816ca872f389678bc478" target="_blank" rel="noopener">Notion ↗</a>
   </div>
 </nav>
@@ -263,36 +293,13 @@ section{padding:110px 0 0;scroll-margin-top:80px}
     <div class="hs"><div class="l">관리 품목 · 거래처</div><div class="v"><span class="cnt" data-to="194">0</span><small>· 100개사</small></div></div>
     <div class="hs"><div class="l">DB 테이블</div><div class="v"><span class="cnt" data-to="24">0</span><small>전 테이블 RLS</small></div></div>
   </div>
-  <div class="scroll-hint"><i></i>SCROLL</div>
 </header>
 </div>
 
-<div class="marquee" aria-hidden="true"><div class="track">
-  <span>Supabase</span><span>PostgreSQL</span><span>Row Level Security</span><span>Google Apps Script</span><span>TypeScript</span><span>Cloudflare Workers</span><span>Edge Functions</span><span>FIFO 원가</span><span>LOT 재고</span><span>월 마감 스냅샷</span><span>발주 · 입고 · 정산</span><span>Git</span>
-  <span>Supabase</span><span>PostgreSQL</span><span>Row Level Security</span><span>Google Apps Script</span><span>TypeScript</span><span>Cloudflare Workers</span><span>Edge Functions</span><span>FIFO 원가</span><span>LOT 재고</span><span>월 마감 스냅샷</span><span>발주 · 입고 · 정산</span><span>Git</span>
-</div></div>
 
 <div class="wrap">
-<section id="skills">
-  <p class="kicker reveal">Skill Set</p>
-  <h2 class="h2 reveal">기준을 만들고, <span class="g">검증하고</span> 넘어갑니다.</h2>
-  <div class="grid3">
-    <div class="glass reveal" style="--d:.05s"><h3>Profile</h3><dl class="kv"><dt>직무</dt><dd>구매 · 총무 · 데이터 관리</dd><dt>경력</dt><dd>총 5년 9개월</dd><dt>거주</dt><dd>서울 관악구</dd><dt>학력</dt><dd>국립부산기계공업고 메카트로닉스</dd></dl></div>
-    <div class="glass reveal" style="--d:.1s"><h3>Domain</h3><ul><li>구매 · 발주 · 정산</li><li>재고 · FIFO 원가 관리</li><li>총무 · 부서 운영비</li><li>ERP 자재관리</li><li>웹 기반 업무 시스템 개발 · 운영</li><li>신뢰성 · 환경 · 성능 시험</li></ul></div>
-    <div class="glass reveal" style="--d:.15s"><h3>Certificates</h3><ul><li>설비보전기능사 · 2017.06</li><li>전자기기기능사 · 2018.07</li><li>ITQ 한글 · 2016.06 / 파워포인트 · 2016.09</li><li>2종 보통 운전면허 · 2020.01</li></ul></div>
-  </div>
-  <div class="tools">
-    <div class="glass tool reveal" style="--w:90%;--d:.05s"><div class="n">Google Sheets<em>90</em></div><p class="u">재고표·원가표·구매총무 시트 6종 설계, FIFO·마감 스냅샷 로직</p><div class="ring"><i></i></div></div>
-    <div class="glass tool reveal" style="--w:85%;--d:.1s"><div class="n">Microsoft Excel<em>85</em></div><p class="u">시험 데이터 취합·정리, 자재 이력·성적서 관리</p><div class="ring"><i></i></div></div>
-    <div class="glass tool reveal" style="--w:70%;--d:.15s"><div class="n">Supabase · PostgreSQL<em>70</em></div><p class="u">ERP DB 24 테이블 설계, DB 함수 채번, RLS</p><div class="ring"><i></i></div></div>
-    <div class="glass tool reveal" style="--w:65%;--d:.2s"><div class="n">Google Apps Script<em>65</em></div><p class="u">시트 자동화, HTML Service 기반 업무 화면</p><div class="ring"><i></i></div></div>
-    <div class="glass tool reveal" style="--w:60%;--d:.25s"><div class="n">TypeScript · JS<em>60</em></div><p class="u">Edge Function 서버 API 모듈 41개</p><div class="ring"><i></i></div></div>
-    <div class="glass tool reveal" style="--w:40%;--d:.3s"><div class="n">Cloudflare Workers<em>40</em></div><p class="u">ERP 호스팅·배포</p><div class="ring"><i></i></div></div>
-  </div>
-</section>
-
 <section id="about">
-  <p class="kicker reveal">About me</p>
+  <p class="kicker reveal">소개</p>
   <div class="about-grid">
     <div class="reveal">
       <p class="quote">구매와 총무는 물건을 사는 일이 아니라, <span class="g">돈과 물건의 흐름</span>을 기준대로 관리하는 일이라고 생각합니다.</p>
@@ -304,10 +311,23 @@ section{padding:110px 0 0;scroll-margin-top:80px}
       <div class="glass reveal" style="--d:.19s"><span class="k">현재</span><div><h4>흐름을 설계하고, 시스템으로 만들다</h4><p>2개 브랜드의 구매·원가·재고 데이터를 설계·운영하고, 그 기준을 웹 ERP로 직접 구현해 현장에 적용하고 있습니다.</p></div></div>
     </div>
   </div>
+  <div class="grid3">
+    <div class="glass reveal" style="--d:.05s"><h3>프로필</h3><dl class="kv"><dt>직무</dt><dd>구매 · 총무 · 데이터 관리</dd><dt>경력</dt><dd>총 5년 9개월</dd><dt>거주</dt><dd>서울 관악구</dd><dt>학력</dt><dd>국립부산기계공업고 메카트로닉스</dd></dl></div>
+    <div class="glass reveal" style="--d:.1s"><h3>업무 영역</h3><ul><li>구매 · 발주 · 정산</li><li>재고 · FIFO 원가 관리</li><li>총무 · 부서 운영비</li><li>ERP 자재관리</li><li>웹 기반 업무 시스템 개발 · 운영</li><li>신뢰성 · 환경 · 성능 시험</li></ul></div>
+    <div class="glass reveal" style="--d:.15s"><h3>자격증</h3><ul><li>설비보전기능사 · 2017.06</li><li>전자기기기능사 · 2018.07</li><li>ITQ 한글 · 2016.06 / 파워포인트 · 2016.09</li><li>2종 보통 운전면허 · 2020.01</li></ul></div>
+  </div>
+  <div class="tools">
+    <div class="glass tool reveal" style="--w:90%;--d:.05s"><div class="n">Google Sheets<em>90</em></div><p class="u">재고표·원가표·구매총무 시트 6종 설계, FIFO·마감 스냅샷 로직</p><div class="ring"><i></i></div></div>
+    <div class="glass tool reveal" style="--w:85%;--d:.1s"><div class="n">Microsoft Excel<em>85</em></div><p class="u">시험 데이터 취합·정리, 자재 이력·성적서 관리</p><div class="ring"><i></i></div></div>
+    <div class="glass tool reveal" style="--w:70%;--d:.15s"><div class="n">Supabase · PostgreSQL<em>70</em></div><p class="u">ERP DB 24 테이블 설계, DB 함수 채번, RLS</p><div class="ring"><i></i></div></div>
+    <div class="glass tool reveal" style="--w:65%;--d:.2s"><div class="n">Google Apps Script<em>65</em></div><p class="u">시트 자동화, HTML Service 기반 업무 화면</p><div class="ring"><i></i></div></div>
+    <div class="glass tool reveal" style="--w:60%;--d:.25s"><div class="n">TypeScript · JS<em>60</em></div><p class="u">Edge Function 서버 API 모듈 41개</p><div class="ring"><i></i></div></div>
+    <div class="glass tool reveal" style="--w:40%;--d:.3s"><div class="n">Cloudflare Workers<em>40</em></div><p class="u">ERP 호스팅·배포</p><div class="ring"><i></i></div></div>
+  </div>
 </section>
 
 <section id="project">
-  <p class="kicker reveal">Main Project · 2026.08 – 진행 중</p>
+  <p class="kicker reveal">메인 프로젝트 · 2026.08 – 진행 중</p>
   <h2 class="h2 reveal">스프레드시트 6종을 <span class="g">클리닉 운영 ERP</span>로.</h2>
   <p class="lead reveal">파일 분산으로 생기는 입력 누락과 마감 이후 소급 변경을 구조적으로 차단하는 것이 목표였습니다. 기획·DB 설계·개발·배포를 단독으로 수행했고, 현재 대시보드(일별 매출·입고 예정·결제 예정)·상담(멤버십·다회차)·시술·환자·구매(발주·입고·거래처·결제 달력)·재고(현황·실사·조정)·통계 4종·기준정보 관리 11종까지 <b>30개 업무 화면과 등록·상세 팝업</b>을 실제 업무에 사용 중입니다.</p>
   <div class="chips reveal"><span class="chip">기획</span><span class="chip">DB 설계</span><span class="chip">개발</span><span class="chip">배포</span><span class="chip">단독 수행</span></div>
@@ -327,7 +347,7 @@ section{padding:110px 0 0;scroll-margin-top:80px}
       <button role="tab" aria-selected="false" data-i="1"><b>재고 현황</b><small>재고는 LOT 현재수량의 합. 기준일을 넣으면 그날 기준 재고·평가금액을 이력에서 재구성</small></button>
       <button role="tab" aria-selected="false" data-i="2"><b>재고 실사</b><small>전 품목을 세어 장부와 맞추고, 차이가 있는 품목만 FIFO 규칙으로 조정 반영</small></button>
       <button role="tab" aria-selected="false" data-i="3"><b>시술 통계</b><small>매출·원가·이익을 축 9개 × 필터 8개로, CSV 내려받기</small></button>
-      <div class="note">4 / 30 SCREENS</div>
+      <div class="note">화면 30개 중 4개</div>
     </div>
   </div>
 
@@ -358,7 +378,7 @@ section{padding:110px 0 0;scroll-margin-top:80px}
 </section>
 
 <section id="sim">
-  <p class="kicker reveal">Side Project · 2026.10 · 공개 데모</p>
+  <p class="kicker reveal">사이드 프로젝트 · 2026.10 · 공개 데모</p>
   <h2 class="h2 reveal">마케팅·회원권 판단을 <span class="g">시뮬레이터</span>로.</h2>
   <p class="lead reveal">마케팅 예산과 신규 회원권 도입을 숫자로 판단하기 위해 시뮬레이터 2종을 직접 개발했습니다(기획·계산 로직·화면·배포). 마케팅은 채널별 DB 비용·CPA·전환율·상담단가로 월 예상 매출을 산출하고 과거 실적 추세·ROAS와 비교하며, 회원권은 몬테카를로 방식으로 기존 고객 매출 잠식분을 반영한 순증 이익·손실 확률·하위/상위 5% 구간을 계산합니다.</p>
   <div class="chips reveal"><span class="chip">CPA · ROAS</span><span class="chip">전환율 역산</span><span class="chip">몬테카를로</span><span class="chip">손익 시나리오</span></div>
@@ -382,21 +402,8 @@ section{padding:110px 0 0;scroll-margin-top:80px}
   </div>
 </section>
 
-<section id="works">
-  <p class="kicker reveal">핵심 작업 · 대표 6건</p>
-  <h2 class="h2 reveal">시트에서 시작해 <span class="g">시스템</span>으로.</h2>
-  <div class="works">
-    <div class="glass work reveal"><span class="y">2026 · 시트 구축</span><h4>재고표 설계·구축</h4><p>입고·사용·재고조정을 분리한 ERP 방식 구조. 2개 브랜드 약 110개 품목 상시 관리.</p><span class="t">Google Sheets · Apps Script</span></div>
-    <div class="glass work reveal" style="--d:.06s"><span class="y">2026 · 시트 구축</span><h4>구매총무 시트 설계·구축</h4><p>거래처 42개사 단가·납기·결제조건과 4개 부서 운영비를 계정과목별로 집행·잔액 관리.</p><span class="t">Google Sheets</span></div>
-    <div class="glass work reveal" style="--d:.12s"><span class="y">2026 · 로직</span><h4>FIFO 단가·재고자산 자동 산출</h4><p>입고 LOT 순서대로 단가를 적용해 사용 원가와 재고자산을 자동 계산.</p><span class="t">Google Sheets · Apps Script</span></div>
-    <div class="glass work reveal"><span class="y">2026 · 로직</span><h4>월 마감 스냅샷 고정 구조</h4><p>마감 시점의 기초·입고·사용·조정·기말을 고정해 소급 변경을 차단, 실사 조정 절차 운영.</p><span class="t">Google Sheets · PostgreSQL</span></div>
-    <div class="glass work reveal" style="--d:.06s"><span class="y">2026 · ERP</span><h4>클리닉 운영 ERP DB 설계</h4><p>테이블 24개, LOT·재고이력·마감·원가기준·시술·상담·결제까지 전 테이블 RLS.</p><span class="t">Supabase · PostgreSQL</span></div>
-    <div class="glass work reveal" style="--d:.12s"><span class="y">2026 · ERP</span><h4>업무 화면 30종 개발</h4><p>상담·시술·환자·구매·재고(현황·실사·조정)·통계·관리 화면과 등록·상세 팝업, 권한별 메뉴. 사용 흐름에 맞춰 화면을 통합 재편.</p><span class="t">Apps Script · TypeScript · Cloudflare</span></div>
-  </div>
-</section>
-
 <section id="exp">
-  <p class="kicker reveal">Experience · 총 5년 9개월</p>
+  <p class="kicker reveal">경력 · 총 5년 9개월</p>
   <h2 class="h2 reveal">자재 검수에서 <span class="g">시스템 운영</span>까지.</h2>
   <ul class="tl" id="tl">
     <li class="tl-item reveal">
@@ -443,7 +450,7 @@ section{padding:110px 0 0;scroll-margin-top:80px}
   </ul>
   <div class="glass honor reveal">
     <div class="medal">1</div>
-    <div><h4>융합과학 프로젝트 작품 전시회 최우수상 <span style="font-family:var(--mono);font-size:12px;color:var(--muted);margin-left:8px">2018.11 · 부산기계공업고등학교</span></h4>
+    <div><h4>융합과학 프로젝트 작품 전시회 최우수상 <span style="font-size:13px;font-weight:500;color:var(--muted);margin-left:8px">2018.11 · 부산기계공업고등학교</span></h4>
       <p>스마트팜 개발 팀 리더 — 전자 회로·센서 설계·프로그래밍이 각각 필요한 과제에서 팀원별 전문성에 따라 역할을 분담하고, 센서 입력값에 따라 설비가 자동 제어되는 구조를 설계. 하드웨어 조립과 일정·작업 흐름 조율 담당.</p></div>
   </div>
 </section>
@@ -453,7 +460,7 @@ section{padding:110px 0 0;scroll-margin-top:80px}
   <p>포트폴리오의 작업 내역 전체(유형별·연도별·도구별)는 Notion 버전에서 확인하실 수 있습니다.</p>
   <a class="btn pri" href="https://nosy-mustard-524.notion.site/3d058e2decc1816ca872f389678bc478" target="_blank" rel="noopener">Notion 포트폴리오 열기 ↗</a>
 </div>
-<footer class="foot"><span>WON INJOON · PORTFOLIO</span><span>LAST UPDATED 2026.09</span></footer>
+<footer class="foot"><span>원인준 포트폴리오</span><span>2026.10 갱신</span></footer>
 </div>
 </div>
 
