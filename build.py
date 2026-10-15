@@ -1,0 +1,301 @@
+# 포트폴리오 v7 생성기 — 템플릿 1개로 index.html(일반)·mobis.html(현대트랜시스 제외) 두 벌
+import sys
+OUT = sys.argv[1]
+
+TRANSYS = '''
+<li class="job">
+  <div class="when">2025.03 – 2025.09<br><span>7개월</span></div>
+  <div><h3>현대트랜시스 <span>전동화신뢰성개발팀 · 연구원</span></h3>
+  <ul>
+    <li>EV 감속기·엑슬 부품(기어·샤프트·베어링) 조립·체결 및 피로·파단·내구·윤활·비틀림 시험 지원</li>
+    <li>시험 파라미터·이상 현상 모니터링과 데이터 정리, 시험 셀 안전점검 이력·시험 자재 성적서 관리</li>
+  </ul></div>
+</li>'''
+
+VARIANTS = {
+  'index.html': dict(total='6년 4개월', notion='https://nosy-mustard-524.notion.site/3cf58e2decc180bc9246e1f800b1babc', transys=TRANSYS),
+  'mobis.html': dict(total='5년 9개월', notion='https://nosy-mustard-524.notion.site/3d058e2decc1816ca872f389678bc478', transys=''),
+}
+
+def gallery(gid, label, shots):
+    imgs = '\n'.join(f'      <img{" class=\"on\"" if i == 0 else ""} src="{src}" alt="{alt}"{"" if i == 0 else " loading=\"lazy\""}>' for i, (src, name, alt) in enumerate(shots))
+    tabs = '\n'.join(f'      <button type="button" role="tab" aria-selected="{"true" if i == 0 else "false"}" data-i="{i}">{name}</button>' for i, (src, name, alt) in enumerate(shots))
+    return f'''  <div class="gallery" id="{gid}">
+    <div class="frame">
+{imgs}
+    </div>
+    <div class="tabs" role="tablist" aria-label="{label}">
+{tabs}
+    </div>
+  </div>'''
+
+ERP_SHOTS = [
+  ('/img/erp-0.webp', '대시보드', '대시보드 — 상담·시술 매출, 일별 매출, 입고·결제 예정(실데이터 블러)'),
+  ('/img/erp-1.webp', '재고 현황', '재고 현황 — 품목별 재고·유효기간·평가금액, 기준일 조회(실데이터 블러)'),
+  ('/img/erp-2.webp', '재고 실사', '재고 실사 — 장부 수량과 실사 수량 비교, 차이만 조정 반영(실데이터 블러)'),
+  ('/img/erp-3.webp', '시술 통계', '시술 통계 — 매출·원가·이익을 축·필터별 조회(실데이터 블러)'),
+]
+SIM_SHOTS = [
+  ('/sim/shots/1.webp', '마케팅 · 월 계획', '마케팅 시뮬레이터 — 기준 실적과 이번 달 안의 예상 매출·상담·마케팅비·DB'),
+  ('/sim/shots/2.webp', '마케팅 · 과거 추세', '마케팅 시뮬레이터 — 마케팅비 대비 매출 추세선 위에 이번 달 안 비교'),
+  ('/sim/shots/3.webp', '회원권 손익', '회원권 손익 시뮬레이터 — 36개월 순증 이익, 손실 확률, 하위·상위 5% 구간'),
+  ('/sim/shots/0.webp', '런처', '시뮬레이터 런처 — 마케팅·회원권 시뮬레이터 선택'),
+]
+
+CSS = '''
+:root{--bg:#fafaf9;--card:#fff;--line:#e7e5e4;--line2:#d6d3d1;--ink:#1c1917;--text:#44403c;--muted:#78716c;--accent:#1e3a8a;
+  --sans:"Gothic A1","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;color-scheme:light}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.7;word-break:keep-all;overflow-wrap:anywhere;-webkit-font-smoothing:antialiased}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3{margin:0;color:var(--ink);letter-spacing:-.01em}
+ul{margin:0;padding:0;list-style:none}
+b{color:var(--ink)}
+.wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+
+.top{position:sticky;top:0;z-index:5;background:rgba(250,250,249,.96);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;height:56px}
+.top strong{color:var(--ink);font-size:15px}
+.top nav{display:flex;gap:20px;font-size:14px}
+.top nav a{color:var(--muted);text-decoration:none}
+.top nav a:hover{color:var(--ink)}
+
+header{padding:56px 0 8px}
+header h1{font-size:32px;font-weight:800}
+header .role{font-size:18px;color:var(--ink);margin-top:4px;font-weight:500}
+header p{max-width:62ch;margin:16px 0 0}
+.facts{display:flex;flex-wrap:wrap;gap:8px 32px;margin:24px 0 0;padding:0}
+.facts div{display:flex;align-items:baseline;gap:8px}
+.facts dt{font-size:14px;color:var(--muted)}
+.facts dd{margin:0;font-size:20px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
+.links{display:flex;flex-wrap:wrap;gap:16px;margin-top:20px;font-size:15px;font-weight:700}
+
+.previews{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:32px}
+.preview{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.preview:hover{border-color:var(--line2)}
+.preview img{display:block;width:100%;aspect-ratio:1400/658;object-fit:cover;object-position:top left;border-bottom:1px solid var(--line)}
+.preview div{padding:12px 16px}
+.preview b{font-size:15px}
+.preview span{display:block;font-size:13.5px;color:var(--muted)}
+
+section{padding:56px 0 0;margin-top:56px;border-top:1px solid var(--line)}
+.sh{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:4px 16px;margin-bottom:20px}
+.sh h2{font-size:24px;font-weight:800}
+.sh .meta{font-size:14px;color:var(--muted)}
+
+.pr{display:grid;grid-template-columns:96px minmax(0,1fr);gap:8px 20px;margin:0 0 24px;max-width:820px}
+.pr dt{font-weight:700;color:var(--ink)}
+.pr dd{margin:0}
+
+.gallery .frame{position:relative;aspect-ratio:1400/658;background:var(--card);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.gallery img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top left;opacity:0}
+.gallery img.on{opacity:1}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tabs button{font:inherit;font-size:14px;color:var(--text);background:var(--card);border:1px solid var(--line);border-radius:6px;padding:6px 12px;cursor:pointer}
+.tabs button[aria-selected=true]{color:#fff;background:var(--ink);border-color:var(--ink)}
+.cap{font-size:13px;color:var(--muted);margin:8px 0 0}
+
+.cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 40px;margin-top:28px}
+.cols h3{font-size:15px;margin-bottom:8px}
+.dots li{position:relative;padding-left:14px;margin:4px 0}
+.dots li::before{content:"";position:absolute;left:0;top:.75em;width:5px;height:5px;border-radius:50%;background:var(--line2)}
+.nums{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.nums div{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:10px 14px}
+.nums dt{font-size:13px;color:var(--muted)}
+.nums dd{margin:0;font-size:20px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums}
+.stack{font-size:14px;color:var(--muted);margin-top:12px}
+.btn{display:inline-block;margin-top:16px;font-weight:700;font-size:15px;color:#fff;background:var(--accent);border-radius:6px;padding:10px 16px;text-decoration:none}
+
+.about{max-width:70ch}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 32px;margin-top:28px}
+.grid3 h3{font-size:15px;margin-bottom:8px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0}
+.kv dt{color:var(--muted)} .kv dd{margin:0;color:var(--ink)}
+.tools li{margin:6px 0} .tools b{display:block;font-size:15px} .tools span{font-size:14px;color:var(--muted)}
+
+.jobs{display:grid;gap:28px}
+.job{display:grid;grid-template-columns:160px minmax(0,1fr);gap:4px 24px}
+.job .when{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.job .when span{font-size:13px}
+.job h3{font-size:18px;font-weight:800;margin-bottom:6px}
+.job h3 span{font-size:14px;font-weight:500;color:var(--muted);margin-left:6px}
+.job li{position:relative;padding-left:14px;margin:3px 0;font-size:15px}
+.job li::before{content:"";position:absolute;left:0;top:.75em;width:5px;height:5px;border-radius:50%;background:var(--line2)}
+.award{margin-top:32px;padding-top:20px;border-top:1px dashed var(--line2);display:grid;grid-template-columns:160px minmax(0,1fr);gap:4px 24px;font-size:15px}
+.award .when{font-size:14px;color:var(--muted)}
+
+footer{margin:72px 0 40px;padding-top:20px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px;font-size:14px;color:var(--muted)}
+
+@media (max-width:760px){
+  .top nav{display:none}
+  header{padding-top:36px} header h1{font-size:28px}
+  .previews,.cols,.grid3{grid-template-columns:1fr}
+  .pr{grid-template-columns:1fr;gap:0} .pr dd{margin-bottom:10px}
+  .job,.award{grid-template-columns:1fr}
+}
+'''
+
+JS = '''
+document.querySelectorAll('.gallery').forEach(function(g){
+  var tabs=[].slice.call(g.querySelectorAll('.tabs button')), imgs=[].slice.call(g.querySelectorAll('.frame img'));
+  tabs.forEach(function(t){ t.addEventListener('click',function(){ var i=+t.dataset.i;
+    tabs.forEach(function(x,j){ x.setAttribute('aria-selected', j===i?'true':'false'); });
+    imgs.forEach(function(im,j){ im.classList.toggle('on', j===i); }); }); });
+});
+'''
+
+def page(v):
+    return f'''<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>원인준 포트폴리오</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@400;500;700;800&display=swap">
+<style>{CSS}</style>
+</head>
+<body>
+<div class="top"><div class="wrap">
+  <strong>원인준</strong>
+  <nav aria-label="섹션"><a href="#erp">ERP</a><a href="#sim">시뮬레이터</a><a href="#about">소개</a><a href="#career">경력</a></nav>
+</div></div>
+
+<main class="wrap">
+<header>
+  <h1>원인준</h1>
+  <div class="role">구매 · 총무 · 데이터 관리 / 업무 시스템 개발</div>
+  <p>비비셀랩 경영지원팀 주임으로 2개 브랜드의 구매·원가·재고 데이터를 관리합니다. 관리 기준을 웹 ERP와 시뮬레이터로 직접 만들어(기획·DB·개발·배포 단독) 실제 업무에 쓰고 있습니다.</p>
+  <dl class="facts">
+    <div><dt>총 경력</dt><dd>{v["total"]}</dd></div>
+    <div><dt>ERP 업무 화면</dt><dd>30개</dd></div>
+    <div><dt>관리 품목</dt><dd>194개</dd></div>
+  </dl>
+  <div class="previews">
+    <a class="preview" href="#erp"><img src="/img/erp-0.webp" alt="클리닉 운영 ERP 대시보드(실데이터 블러)"><div><b>클리닉 운영 ERP</b><span>업무 화면 30개 · 2026.08 – 운영 중</span></div></a>
+    <a class="preview" href="#sim"><img src="/sim/shots/2.webp" alt="마케팅 시뮬레이터 과거 실적 추세 화면(연습용 숫자)"><div><b>마케팅·회원권 손익 시뮬레이터</b><span>공개 데모 있음 · 2026.10</span></div></a>
+  </div>
+</header>
+
+<section id="erp">
+  <div class="sh"><h2>클리닉 운영 ERP</h2><span class="meta">2026.08 – 진행 중 · 기획·DB 설계·개발·배포 단독</span></div>
+  <dl class="pr">
+    <dt>문제</dt><dd>구매·재고·원가 데이터가 스프레드시트 6종에 흩어져 입력 누락과 마감 이후 소급 변경이 반복됐습니다.</dd>
+    <dt>만든 것</dt><dd>상담·시술·환자·구매·재고·통계·기준정보를 하나로 묶은 웹 ERP. 시술을 저장하면 재고·FIFO 원가·회원권 잔액이 자동으로 차감됩니다.</dd>
+    <dt>결과</dt><dd>업무 화면 30개를 실제 업무에 사용 중이며, 월 마감(재고·원가 집계)이 반나절에서 1시간 이내로 줄었습니다.</dd>
+  </dl>
+{gallery("g-erp", "ERP 화면", ERP_SHOTS)}
+  <p class="cap">실제 운영 화면이라 금액·품목은 흐리게 처리했습니다.</p>
+  <div class="cols">
+    <div><h3>설계 포인트</h3>
+      <ul class="dots">
+        <li><b>LOT·FIFO 원가</b> — 입고 LOT 순서대로 차감해 실제 단가로 사용 원가와 재고자산을 계산</li>
+        <li><b>되짚을 수 있는 재고</b> — 모든 변동에 전후 재고를 기록해 기준일 재고를 재구성, 실사는 차이만 조정으로 반영</li>
+        <li><b>병원 단위 격리</b> — 전 테이블 RLS, 채번·마감 검증은 DB 함수에서 처리</li>
+      </ul>
+      <p class="stack">Apps Script · Cloudflare Workers · Supabase Edge Function(TypeScript) · PostgreSQL</p>
+    </div>
+    <div><h3>규모</h3>
+      <dl class="nums">
+        <div><dt>업무 화면</dt><dd>30</dd></div>
+        <div><dt>DB 테이블</dt><dd>24</dd></div>
+        <div><dt>서버 API 모듈</dt><dd>41</dd></div>
+        <div><dt>커밋</dt><dd>230</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section id="sim">
+  <div class="sh"><h2>마케팅·회원권 손익 시뮬레이터</h2><span class="meta">2026.10 · 기획·계산 로직·화면·배포 단독</span></div>
+  <dl class="pr">
+    <dt>문제</dt><dd>마케팅 예산과 신규 회원권 가격을 엑셀로 수기 검토해 며칠씩 걸리고, 여러 안을 나란히 비교하기 어려웠습니다.</dd>
+    <dt>만든 것</dt><dd>마케팅: 채널별 DB 비용·CPA, 전환율, 상담단가로 월 예상 매출을 내고 과거 실적 추세·ROAS와 비교, 목표 매출까지 필요한 CPA·DB·전환율을 역산합니다. 회원권: 몬테카를로 500회로 기존 고객 매출 잠식분을 반영한 순증 이익·손실 확률·하위/상위 5% 구간을 계산합니다.</dd>
+    <dt>결과</dt><dd>시나리오별 손익분기점을 바로 확인하고, 복수 가격안 비교 결과를 최종 회원권 가격·구성 결정에 활용했습니다.</dd>
+  </dl>
+{gallery("g-sim", "시뮬레이터 화면", SIM_SHOTS)}
+  <p class="cap">공개 데모 화면입니다. 숫자·병원명은 모두 연습용 임의 값입니다.</p>
+  <a class="btn" href="/sim/" target="_blank" rel="noopener">데모 직접 써 보기 (비밀번호 demo) ↗</a>
+</section>
+
+<section id="about">
+  <div class="sh"><h2>소개</h2></div>
+  <p class="about">반복되는 업무를 보면 왜 매번 같은 확인을 해야 하는지부터 따져 봅니다. 발주가 늦어지면 라인이 서고 자재 이력이 부정확하면 원가가 틀어진다는 것을 현장에서 겪었기 때문에, 문제를 그때그때 처리하기보다 같은 문제가 다시 생기지 않도록 기준과 절차로 남기는 방식을 선호합니다.</p>
+  <div class="grid3">
+    <div><h3>프로필</h3>
+      <dl class="kv"><dt>직무</dt><dd>구매 · 총무 · 데이터 관리</dd><dt>경력</dt><dd>총 {v["total"]}</dd><dt>거주</dt><dd>서울 관악구</dd><dt>학력</dt><dd>국립부산기계공업고 메카트로닉스</dd></dl>
+    </div>
+    <div><h3>도구</h3>
+      <ul class="tools">
+        <li><b>Google Sheets · Excel</b><span>재고표·원가표·구매총무 시트 6종, 시험 데이터 정리</span></li>
+        <li><b>Supabase · PostgreSQL</b><span>ERP DB 24 테이블, DB 함수, RLS</span></li>
+        <li><b>Apps Script · TypeScript</b><span>업무 화면, 서버 API 모듈 41개</span></li>
+      </ul>
+    </div>
+    <div><h3>자격증</h3>
+      <ul class="dots"><li>설비보전기능사 · 2017.06</li><li>전자기기기능사 · 2018.07</li><li>ITQ 한글 · 2016.06</li><li>ITQ 파워포인트 · 2016.09</li><li>2종 보통 운전면허 · 2020.01</li></ul>
+    </div>
+  </div>
+</section>
+
+<section id="career">
+  <div class="sh"><h2>경력</h2><span class="meta">총 {v["total"]}</span></div>
+  <ul class="jobs">
+<li class="job">
+  <div class="when">2026.04 – 재직 중</div>
+  <div><h3>비비셀랩 <span>경영지원팀 · 주임</span></h3>
+  <ul>
+    <li>2개 브랜드 의약품·의료소모품 발주부터 정산까지 관리, 거래처 42개사 단가·납기·결제조건 조율</li>
+    <li>재고표·원가표·구매총무 시트 6종 설계 — 약 110개 품목·재고자산 6.8억 원 관리, FIFO 단가 자동 산출</li>
+    <li>마케팅비 구조·CPA·ROAS 지표 정리와 월 마케팅 계획, 제주 신규 병원 오픈 준비(판매가 산정·손익 예측·구매 셋업, 2026.10~)</li>
+    <li>클리닉 운영 ERP와 마케팅·회원권 손익 시뮬레이터 직접 개발(위 프로젝트)</li>
+  </ul></div>
+</li>{v["transys"]}
+<li class="job">
+  <div class="when">2024.12 – 2025.03<br><span>4개월</span></div>
+  <div><h3>에이스원텍 <span>기반기술팀 · 연구원</span></h3>
+  <ul>
+    <li>LG전자 H&amp;A 가전 제품 분해·조립 후 기능별 시험, 선행 연구 실험·기술 검토 지원</li>
+    <li>시료·지그를 개체 단위로 구분해 보관·관리, 시험 데이터 취합·정리</li>
+  </ul></div>
+</li>
+<li class="job">
+  <div class="when">2023.05 – 2023.12<br><span>8개월</span></div>
+  <div><h3>삼영에스앤씨 <span>개발팀 · 연구원</span></h3>
+  <ul>
+    <li>자동차 압력센서 DV 과제에서 오차율 목표 ±1% 대비 ±0.8% 달성 — 100회 이상 반복 시험, 필터 회로 개선</li>
+    <li>발주처 규격 원본을 분석해 센서 사양·장착 위치별 시험 프로파일 추출</li>
+    <li>시제품 품질 검사, 시험 일정·보고서·자료 관리</li>
+  </ul></div>
+</li>
+<li class="job">
+  <div class="when">2019.01 – 2023.04<br><span>4년 4개월</span></div>
+  <div><h3>코코도르 <span>지원팀 · 총무 / 자재 / 생산관리</span></h3>
+  <ul>
+    <li>자재 입고 검수, 입고 성적서 작성·ERP 등록, 자재 이력·불출 관리</li>
+    <li>신규 공장 운영 — 생산 현황·계획 수립, 소모품 구매·납기 조율, 도급 인력 운영 지원</li>
+    <li>시설물·차량·비품 관리, 외주 정기 점검 대응, 신규 입사자 온보딩</li>
+  </ul></div>
+</li>
+  </ul>
+  <div class="award">
+    <div class="when">2018.11</div>
+    <div><b>융합과학 프로젝트 작품 전시회 최우수상</b> · 부산기계공업고등학교<br>스마트팜 개발 팀 리더 — 센서 입력에 따라 설비가 자동 제어되는 구조 설계, 역할 분담·일정 조율</div>
+  </div>
+</section>
+
+<footer><span>원인준 · 2026.10 갱신</span><a href="{v["notion"]}" target="_blank" rel="noopener">전체 작업 내역(Notion) ↗</a></footer>
+</main>
+<script>{JS}</script>
+</body>
+</html>
+'''
+
+for name, v in VARIANTS.items():
+    open(f'{OUT}/{name}', 'w').write(page(v))
+    print(name)
