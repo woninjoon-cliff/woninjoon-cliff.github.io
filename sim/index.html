@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<script src="/sim/demo.js"></script>
+<meta name="robots" content="noindex">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>VIVICELLLAB Simulator</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+/* 시뮬레이터 런처 — 맥 로그인 창 꼴(F′): 맨 위 가운데 앱 이름 · 가운데 그 시뮬의 대표 숫자 카드 + 그래프 카드 · 아래 가운데 시뮬 타일 줄과 비밀번호.
+   시안 https://claude.ai/artifact/UdQoUMMgXPRny5pqFe5MDh · 스펙 docs/superpowers/specs/2026-10-14-simulator-launcher-design.md
+   ★ 색(사용자 10/15): 바탕은 ERP 와 같은 옅은 회색(A — "검은색이라 안에 들어가면 잘 안 보인다"), 누르는 것 · 고른 것은 검정(잉크),
+      포인트는 파랑 한 가지(2 — "보라가 촌스럽다")만 'Simulator' 와 그래프의 이번 달 값에. 비교 https://claude.ai/artifact/CnPaPfoshDQvD7HJWphcRv */
+:root{
+  --바탕:#f5f5f5; --바탕빛:#ffffff; --면:#ffffff; --면위:transparent;
+  --선:#e0e0e0; --선2:#d1d1d1; --선3:#2563eb;
+  --잉크:#1f1f22; --회1:#424242; --회2:#616161; --회3:#9e9e9e; --회4:#c7c7c7; --회5:#e6e6e6;
+  --막대1:#b4b4b4; --막대2:#d6d6d6; --띠:rgba(0,0,0,.05);
+  --유리:#ffffff; --유리2:#f0f0f0;
+  --칸면:#ffffff; --칸면2:#ffffff; --칸선:#d1d1d1; --칸글:#707070; --꺼짐면:#ebebeb;
+  --포인트:#2563eb; --포인트빛:rgba(37,99,235,.14); --빨강:#b10e1c; --빨강선:rgba(177,14,28,.6); --초록:#0e700e;
+  --카드그림자:0 18px 40px rgba(0,0,0,.10),0 2px 6px rgba(0,0,0,.05); --고른그림자:0 8px 20px rgba(0,0,0,.18);
+  --font:"Pretendard Variable",Pretendard,"Segoe UI","Malgun Gothic","Noto Sans KR",sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--바탕);color:var(--잉크);font-family:var(--font);font-size:14px;line-height:1.5;word-break:keep-all}   /* 한글 낱말 중간에서 줄바꿈하지 않게 */
+button,input{font:inherit;color:inherit}
+button:focus-visible{outline:2px solid var(--잉크);outline-offset:3px}
+
+/* 칸이 많아져도(처음 두 칸) 겹치지 않게 min-height — 낮은 화면이면 쪽이 내려간다 */
+.무대{min-height:100vh;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;row-gap:24px;justify-items:center;align-items:center;padding:56px 48px 40px;
+  background:radial-gradient(ellipse 62% 55% at 50% 44%,var(--바탕빛),transparent 72%),var(--바탕)}
+.브랜드{margin:0;font-size:68px;font-weight:800;letter-spacing:-.035em;line-height:1.02;text-align:center;text-wrap:balance}
+.브랜드 span{color:var(--포인트)}
+
+/* 그림 — 카드 둘(뒤 그래프 · 앞 핵심 숫자). 각 시뮬의 대표 예시 숫자, 로그인 전이라 실데이터 아님 */
+.그림판{position:relative;width:min(600px,100%);height:380px}
+.조각{position:absolute;background:var(--면);border:1px solid var(--선);border-radius:12px;box-shadow:var(--카드그림자),inset 0 1px 0 var(--면위);padding:18px 20px;font-variant-numeric:tabular-nums}
+.조각.뒤{right:0;top:12px;width:80%}
+.조각.앞{left:0;bottom:22px;width:54%}
+.조각 .이름{font-size:12px;color:var(--회2)}
+.조각 .큰{font-size:36px;font-weight:700;letter-spacing:-.02em;line-height:1.2;margin-top:4px}
+.조각 .작{font-size:12px;color:var(--회2);margin-top:4px}
+.막대틀{height:4px;border-radius:2px;background:var(--회5);margin-top:14px;overflow:hidden}
+.막대틀 i{display:block;height:100%;background:var(--포인트)}
+.조각 svg{display:block;width:100%;height:auto;margin-top:10px}
+.조각 svg text{font-family:var(--font);font-size:12px;fill:var(--회2)}
+.막대들{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+.막대줄{display:grid;grid-template-columns:minmax(0,1fr) 60px;gap:4px 10px;align-items:center}
+.막대줄 span{grid-column:1/-1;font-size:12px;color:var(--회1)}
+.막대{position:relative;height:14px}
+.막대 i{position:absolute;top:0;bottom:0;border-radius:2px}
+.막대줄 b{font-size:13px;font-weight:600;color:var(--회1);text-align:right}
+.막대줄.끝 b{color:var(--잉크);font-weight:700}
+
+/* 아래 가운데 — 시뮬 타일 줄(고른 것 = 검정 타일) + 비밀번호 알약 */
+/* 크기 · 밝기는 사용자 10/14 "아래가 작다 · 칸 글자와 화살표가 잘 안 보인다" — 타일 88 · 칸 440×60 · 글자 18, 칸 안 글자와 꺼진 화살표도 밝은 회색 */
+.아래{display:flex;flex-direction:column;align-items:center;gap:24px;width:100%}
+.타일줄{display:flex;gap:64px}
+.고름{border:0;background:none;padding:0;display:flex;flex-direction:column;align-items:center;gap:14px;cursor:pointer;color:var(--회1);font-size:16px;font-weight:500;transition:color .2s}
+.타일{width:88px;height:88px;border-radius:24px;display:grid;place-items:center;background:var(--유리);border:1px solid var(--선2);color:var(--칸글);transition:background .2s,color .2s,transform .2s,box-shadow .2s}
+.타일 svg{width:38px;height:38px}
+.선{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.고름:hover .타일{background:var(--유리2);color:var(--잉크)}
+.고름[aria-selected="true"]{color:var(--잉크);font-weight:600}
+.고름[aria-selected="true"] .타일{background:var(--잉크);border-color:var(--잉크);color:var(--바탕);transform:scale(1.08);box-shadow:var(--고른그림자)}
+.칸묶음{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%}   /* 폭 100% 여야 칸의 max-width 가 폰에서 먹는다 */
+.안내{margin:0;font-size:14px;color:var(--회1)}
+.알칸{display:flex;align-items:center;width:440px;max-width:100%;height:60px;padding:0 7px 0 26px;border-radius:30px;background:var(--칸면);border:1px solid var(--칸선);transition:border-color .2s,background .2s}
+.알칸:focus-within{border-color:var(--선3);background:var(--칸면2)}
+.칸묶음:has(#오류:not(:empty)) .알칸{border-color:var(--빨강선)}
+.알칸 input{flex:1;min-width:0;height:100%;border:0;background:none;color:var(--잉크);font-size:18px;letter-spacing:.02em;outline:none}
+.알칸 input::placeholder{color:var(--칸글);letter-spacing:0;opacity:1}
+.알칸 input::-ms-reveal{display:none}   /* 브라우저 눈 아이콘이 들어가기 단추와 붙는다 */
+/* 들어가기 — 칸 안 검정 동그라미(넣기 전엔 꺼진 회색), 로그인돼 있으면 칸 없이 검정 알약 */
+.단추{width:46px;height:46px;flex:none;border-radius:50%;border:0;background:var(--잉크);color:var(--바탕);display:grid;place-items:center;cursor:pointer;transition:background .2s,color .2s}
+.단추 svg{width:22px;height:22px}
+.단추:disabled{background:var(--꺼짐면);color:var(--칸글);cursor:default}
+.단추.넓게{width:auto;height:60px;padding:0 32px;border-radius:30px;display:inline-flex;align-items:center;gap:10px;font-size:18px;font-weight:600}
+.로그인됨{display:inline-flex;align-items:center;gap:8px;font-size:14px;color:var(--회1)}
+.로그인됨::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--초록)}
+.글단추{border:0;background:none;color:var(--회1);font-size:14px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:2px 4px}
+.도움,.오류{margin:0;font-size:14px;color:var(--회2);text-align:center}
+.오류{color:var(--빨강)}
+.오류:empty{display:none}
+.오류:not(:empty) + .도움{display:none}
+
+@media (max-height:820px) and (min-width:901px){
+  .무대{padding:28px 48px 32px;row-gap:12px}
+  .브랜드{font-size:56px}
+  .그림판{zoom:.78}   /* 아래가 커져 낮은 화면(1366×680)에도 한 화면에 — 카드 배치는 그대로 줄인다 */
+}
+@media (max-width:900px){
+  .무대{padding:36px 16px 36px;row-gap:28px}
+  .브랜드{font-size:38px}
+  .그림판{height:360px}
+  .조각.앞{width:74%}
+  .조각 .큰{font-size:28px}
+  .타일줄{gap:32px}
+}
+/* 비밀번호 바꾸기 — 맨 아래 가운데 흐린 작은 글(사용자 10/15 ②C, 직원 눈에 덜 띄게), 누르면 마스터 PIN 창 */
+.무대{position:relative}
+.바닥글{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);border:0;background:none;padding:4px 6px;font:inherit;font-size:13px;color:var(--회3);cursor:pointer;white-space:nowrap}
+.바닥글:hover{color:var(--회1);text-decoration:underline;text-underline-offset:3px}
+.창{width:400px;max-width:calc(100vw - 32px);border:1px solid var(--선);border-radius:12px;background:var(--면);color:var(--잉크);padding:22px 24px;box-shadow:var(--카드그림자)}
+.창::backdrop{background:rgba(0,0,0,.35)}
+.창 form{display:flex;flex-direction:column;gap:12px}
+.창 h2{margin:0;font-size:18px;font-weight:700}
+.가름{display:flex;border:1px solid var(--선2);border-radius:6px;overflow:hidden}
+.가름 button{flex:1;height:36px;border:0;background:var(--면);color:var(--회2);font:inherit;font-size:14px;cursor:pointer}
+.가름 button[aria-checked="true"]{background:var(--잉크);color:var(--바탕)}
+.창 label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--회2)}
+.창 input{height:40px;padding:0 12px;border:1px solid var(--선2);border-radius:6px;background:var(--면);color:var(--잉크);font:inherit;font-size:15px;outline:none}
+.창 input:focus{border-color:var(--선3);box-shadow:0 0 0 3px var(--포인트빛)}
+.창 .안내,.창글{font-size:13px}
+.창글{margin:0;color:var(--회2)}
+.단추줄{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
+.단추줄 button{height:38px;padding:0 18px;border-radius:6px;border:1px solid var(--선2);background:var(--면);color:var(--잉크);font:inherit;font-size:14px;cursor:pointer}
+.단추줄 .주{background:var(--잉크);border-color:var(--잉크);color:var(--바탕)}
+.단추줄 .주:disabled{opacity:.6;cursor:default}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main class="무대" id="런처">
+  <h1 class="브랜드">VIVICELLLAB <span>Simulator</span></h1>
+  <div class="그림판" aria-hidden="true">
+    <div data-그림="marketing">
+      <div class="조각 뒤"><div class="이름">과거 실적과 견주기 — 마케팅비 대비 매출</div>
+        <svg viewBox="0 0 510 230"><line x1="0" x2="510" y1="40" y2="40" stroke="var(--회4)" stroke-dasharray="4 4"/><text x="508" y="30" text-anchor="end">목표 11억</text>
+          <path d="M10,214 L500,56 L500,94 L10,230 Z" fill="var(--띠)"/><line x1="10" x2="500" y1="222" y2="74" stroke="var(--회4)" stroke-width="2"/>
+          <circle cx="200" cy="166" r="6" fill="var(--회3)" stroke="var(--면)" stroke-width="2"/><circle cx="262" cy="147" r="6" fill="var(--회3)" stroke="var(--면)" stroke-width="2"/>
+          <circle cx="322" cy="129" r="6" fill="var(--회3)" stroke="var(--면)" stroke-width="2"/><circle cx="322" cy="116" r="6" fill="var(--회3)" stroke="var(--면)" stroke-width="2"/>
+          <circle cx="420" cy="92" r="17" fill="var(--포인트빛)"/><circle cx="420" cy="92" r="9" fill="var(--포인트)" stroke="var(--면)" stroke-width="2.5"/></svg></div>
+      <div class="조각 앞"><div class="이름">10월 예상 매출</div><div class="큰">8.98억</div><div class="작">최근 3달 평균보다 +31.8%</div><div class="막대틀"><i style="width:82%"></i></div><div class="작">월 목표 11억의 82%</div></div>
+    </div>
+    <div data-그림="membership" hidden>
+      <div class="조각 뒤"><div class="이름">이익 구성</div>
+        <div class="막대들">
+          <div class="막대줄"><span>회원권에서 남는 돈</span><div class="막대"><i style="left:0;width:100%;background:var(--막대1)"></i></div><b>8.18억</b></div>
+          <div class="막대줄"><span>기존 고객에게서 줄어드는 이익</span><div class="막대"><i style="left:29%;width:71%;background:var(--막대2)"></i></div><b>−5.80억</b></div>
+          <div class="막대줄 끝"><span>실제로 늘어나는 이익</span><div class="막대"><i style="left:0;width:29%;background:var(--포인트)"></i></div><b>2.38억</b></div>
+        </div></div>
+      <div class="조각 앞"><div class="이름">실제로 늘어나는 이익 (3년)</div><div class="큰">2억 3,769만</div><div class="작">도입해서 손해 볼 확률 6.2%</div></div>
+    </div>
+  </div>
+  <form class="아래" id="폼" autocomplete="off" novalidate>
+    <div class="타일줄" role="tablist" aria-label="시뮬레이터">
+      <button type="button" class="고름" role="tab" aria-selected="true" data-시뮬="marketing"><span class="타일"><svg viewBox="0 0 24 24" aria-hidden="true"><polyline class="선" points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline class="선" points="16 7 22 7 22 13"/></svg></span>마케팅 시뮬레이터</button>
+      <button type="button" class="고름" role="tab" aria-selected="false" data-시뮬="membership"><span class="타일"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="선" d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path class="선" d="M13 5v2M13 11v2M13 17v2"/></svg></span>회원권 손익 시뮬레이터</button>
+    </div>
+    <div class="칸묶음">
+      <p class="안내" id="안내" hidden></p>
+      <span class="로그인됨" id="로그인됨" hidden>이 브라우저에서 로그인돼 있음</span>
+      <div class="알칸" id="칸1"><input id="비번" type="password" autocomplete="current-password"></div>
+      <div class="알칸" id="칸2" hidden><input id="비번2" type="password" autocomplete="new-password" placeholder="한 번 더" aria-label="같은 비밀번호를 한 번 더"></div>
+      <button type="submit" class="단추" id="단추"></button>
+      <button type="button" class="글단추" id="다른" hidden>다른 비밀번호로 들어가기</button>
+      <p class="오류" id="오류" role="alert"></p>
+      <p class="도움" id="도움">비밀번호는 시뮬레이터마다 따로입니다</p>
+    </div>
+  </form>
+  <button type="button" class="바닥글" id="비번바꾸기">비밀번호 바꾸기</button>
+</main>
+<dialog class="창" id="바꾸기창" aria-labelledby="바꾸기제목">
+  <form id="바꾸기폼" autocomplete="off" novalidate>
+    <h2 id="바꾸기제목">시뮬레이터 비밀번호 바꾸기</h2>
+    <div class="가름" role="radiogroup" aria-label="바꿀 시뮬레이터"><button type="button" role="radio" data-바꿀="marketing">마케팅</button><button type="button" role="radio" data-바꿀="membership">회원권 손익</button></div>
+    <label>마스터 PIN<input id="핀" type="password" autocomplete="off" placeholder="나만 아는 PIN"></label>
+    <p class="안내" id="핀안내" hidden>처음이라 마스터 PIN 을 정합니다 — 6자 이상, 같은 PIN 을 한 번 더</p>
+    <label id="핀2칸" hidden>마스터 PIN 다시<input id="핀2" type="password" autocomplete="off"></label>
+    <label>새 비밀번호<input id="새비번" type="password" autocomplete="new-password" placeholder="8자 이상"></label>
+    <label>새 비밀번호 다시<input id="새비번2" type="password" autocomplete="new-password"></label>
+    <p class="창글" id="바꾸기글"></p>
+    <p class="오류" id="바꾸기오류" role="alert"></p>
+    <div class="단추줄"><button type="button" id="바꾸기닫기">닫기</button><button type="submit" class="주" id="바꾸기단추">바꾸기</button></div>
+  </form>
+</dialog>
+<script type="module" src="launcher.js"></script>
+</body>
+</html>

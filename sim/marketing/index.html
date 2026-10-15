@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<script src="/sim/demo.js"></script>
+<meta name="robots" content="noindex">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>마케팅 시뮬레이터</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="/sim/shared.css">
+<style>
+/* 레이아웃: 위 막대(이름 · 병원 · 탭) → 시뮬레이터 = 달 줄 · 제목 줄(달 · 계획/실적 · 저절로 저장) · 안 탭 · 실적이면 실적 숫자 / 계획이면 기준 · 결과 한 줄 · 과거 실적과 견주기 · 바꿔 보기 | 그래프 · 목표까지 메우려면 · 매출 목표 · 마케팅비 (v5 — 과거로 배우는 예상 https://claude.ai/artifact/E9ZFH4XQELbmznTT7hZ51J)
+   월별 실적 = 달이 열인 표. 확정 시안 A(ERP 생김새) https://claude.ai/artifact/HjbD6bKB29DaL9unRJ4jTx (v3)
+   ★ 색은 런처와 같은 값(사용자 10/15 — 10/14 차콜을 되돌림): 바탕 ERP 옅은 회색 · 흰 카드, 주 단추 · 고른 표시(탭 · 달 · 가름 밑줄) · 포커스는 검정,
+      포인트는 파랑 한 가지만 데이터에(이 달 안 · 목표 진행 막대 · 슬라이더 · 마케팅비 구성). 비교 https://claude.ai/artifact/CnPaPfoshDQvD7HJWphcRv */
+:root{
+  --bg:#f5f5f5; --bg1:#ffffff; --bg2:#fafafa; --bg4:#f0f0f0;
+  --fg1:#242424; --fg2:#424242; --fg3:#616161; --fg4:#707070;
+  --stroke1:#d1d1d1; --stroke2:#e0e0e0;
+  --brand:#2563eb; --주:#1f1f22; --주위:#3a3a3f; --on주:#ffffff; --고름:#1f1f22;
+  --onBrand:#ffffff; --chart:#2563eb; --onChart:#ffffff; --barReal:#c7c7c7; --past:#9e9e9e; --plan:#2563eb; --ok:#0e700e;
+  --warn:#bc4b09; --danger:#b10e1c; --inv:#242424; --onInv:#ffffff;
+  --band:rgba(158,158,158,.22);   /* 과거 추세 띠 */
+  --font:"Pretendard Variable",Pretendard,"Segoe UI","Malgun Gothic","Noto Sans KR",sans-serif;
+  --r:4px; --r2:8px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg1);font-family:var(--font);font-size:16px;line-height:1.5}
+button,input,select{font:inherit;color:inherit}
+.흐{color:var(--fg3)}
+.수{font-variant-numeric:tabular-nums}
+
+/* 단추 · 입력 칸 — ERP 꼴 */
+.단추{font-size:15px;height:34px;padding:0 14px;border-radius:var(--r);border:1px solid var(--stroke1);background:var(--bg1);color:var(--fg1);cursor:pointer;white-space:nowrap}
+.단추:hover{background:var(--bg4)}
+.단추.주{background:var(--주);border-color:var(--주);color:var(--on주);font-weight:600}
+.단추.주:hover{background:var(--주위)}
+.단추.글{border-color:transparent;background:none;color:var(--fg2);padding:0 6px}
+.단추.글:hover{color:var(--fg1);background:var(--bg4)}
+select,.칸글{font-size:15px;color:var(--fg1);background:var(--bg1);border:1px solid var(--stroke1);border-radius:var(--r);height:34px;padding:0 10px;min-width:0}
+.칸글{text-align:right;font-variant-numeric:tabular-nums;width:100%}
+.칸글.이름칸{text-align:left}
+.칸글.자동{background:color-mix(in srgb,var(--fg1) 5%,var(--bg1));color:var(--fg3)}   /* DB 비용 셋 중 나머지 둘로 셈한 칸 — 쳐도 되고, 치면 다른 칸이 자동이 된다 */
+select:focus,.칸글:focus{outline:none;box-shadow:inset 0 -2px 0 var(--고름)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--고름);outline-offset:1px}
+
+/* 맨 위 막대 */
+.앱막대{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;align-items:center;gap:20px;background:var(--bg1);border-bottom:1px solid var(--stroke2);padding:0 24px;min-height:56px;flex-wrap:wrap}
+.앱막대 .이름{font-weight:600}
+.앱탭{display:flex;gap:20px;align-self:stretch;align-items:stretch}
+.앱탭 button{background:none;border:0;padding:0;color:var(--fg3);cursor:pointer;box-shadow:inset 0 -2px 0 transparent}
+.앱탭 button[aria-selected="true"]{color:var(--fg1);font-weight:600;box-shadow:inset 0 -2px 0 var(--고름)}
+.앱막대 .끝{margin-left:auto;display:flex;gap:4px}
+
+.쪽{max-width:1600px;margin:0 auto;padding-inline:24px;padding-block:24px 64px;display:flex;flex-direction:column;gap:16px}
+.판들{display:flex;flex-direction:column;gap:16px}
+.판{background:var(--bg1);border:1px solid var(--stroke2);border-radius:var(--r);min-width:0}
+.판머리{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--stroke2);flex-wrap:wrap;min-height:54px}
+.판머리 h3{margin:0;font-size:16px;font-weight:600}
+.판머리 .흐{font-size:13px}
+.판머리 .끝{margin-left:auto;display:flex;gap:6px;align-items:center}
+.판몸{padding:14px 20px}
+.표아래{display:flex;justify-content:space-between;align-items:center;padding:8px 16px;border-top:1px solid var(--stroke2);font-size:13px;color:var(--fg3);gap:10px;flex-wrap:wrap}
+
+/* 제목 줄 — 안 · 종류 · 달 · 상태 · 저장 */
+.제목줄{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.제목줄 h2{margin:0 6px 0 0;font-size:23px;font-weight:600}
+.제목줄 label{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--fg3)}
+.제목줄 .상태{font-size:13px;color:var(--fg3)}
+.제목줄 .상태.고침{color:var(--warn)}
+.제목줄 .끝{margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.새이름{display:inline-flex;gap:6px;align-items:center}
+.새이름 .칸글{width:220px;text-align:left}
+.오류{margin:0;min-height:0;font-size:15px;color:var(--danger)}
+.오류:empty{display:none}
+
+/* 달 줄 · 계획/실적 가름 · 안 탭 · 저절로 저장 표시 (v4 — 시안 https://claude.ai/artifact/DUSfwUUmMws3RPfpcp48io) */
+.달줄{display:flex;background:var(--bg1);border:1px solid var(--stroke2);border-radius:var(--r);padding:0 6px;overflow-x:auto;scrollbar-width:thin;scrollbar-color:var(--stroke1) transparent}   /* 15달 — 굵은 기본 막대 대신 얇게 */
+.달줄 button{background:none;border:0;padding:10px 16px;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-width:104px;box-shadow:inset 0 -2px 0 transparent;color:inherit}
+.달줄 button b{font-weight:600;font-size:16px;color:var(--fg2)}
+.달줄 button small{font-size:12px;color:var(--fg4);white-space:nowrap}
+.달줄 button[aria-selected="true"]{box-shadow:inset 0 -2px 0 var(--고름)}
+.달줄 button[aria-selected="true"] b{color:var(--fg1)}
+.가름{display:inline-flex;border:1px solid var(--stroke1);border-radius:var(--r);overflow:hidden}
+.가름 button{border:0;background:var(--bg1);padding:0 16px;height:34px;font-size:15px;cursor:pointer;color:var(--fg2)}
+.가름 button+button{border-left:1px solid var(--stroke1)}
+.가름 button[aria-pressed="true"]{background:var(--bg4);color:var(--fg1);font-weight:600;box-shadow:inset 0 -2px 0 var(--고름)}
+.저장표시{font-size:13px;color:var(--fg3);display:inline-flex;align-items:center;gap:6px}
+.저장표시::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--fg4)}
+.저장표시.됨::before{background:var(--ok)}
+.저장표시.못{color:var(--danger)}
+.저장표시.못::before{background:var(--danger)}
+.안탭{display:flex;gap:18px;border-bottom:1px solid var(--stroke2);align-items:flex-end;flex-wrap:wrap}
+.안탭 .탭{background:none;border:0;padding:6px 0 8px;cursor:pointer;color:var(--fg3);box-shadow:inset 0 -2px 0 transparent;display:flex;flex-direction:column;align-items:flex-start;line-height:1.35;text-align:left}
+.안탭 .탭 small{font-size:12px;color:var(--fg4);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.안탭 .탭[aria-selected="true"]{color:var(--fg1);font-weight:600;box-shadow:inset 0 -2px 0 var(--고름)}
+.안탭 .단추{margin-bottom:6px}
+.메모칸{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--fg3)}
+.메모칸 .칸글{width:260px;text-align:left}
+.빈판{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:20px 16px;background:var(--bg1);border:1px dashed var(--stroke1);border-radius:var(--r);color:var(--fg2);font-size:15px}
+.빈판 .단추줄{justify-content:flex-start;flex-wrap:wrap}
+.빈판 small{flex-basis:100%;font-size:13px}
+svg text.테{paint-order:stroke;stroke:var(--bg1);stroke-width:4px;stroke-linejoin:round}
+svg .이름글{fill:var(--fg2)}
+svg .이름글.보는{fill:var(--fg1);font-weight:700}
+.비교범례{display:flex;gap:12px;font-size:13px;color:var(--fg3);margin-left:auto}
+.비교범례 i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+
+/* 칸 줄 — 이름 위 · 칸 아래 */
+.칸줄{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px 20px;padding:14px 20px}
+.칸{display:flex;flex-direction:column;gap:4px;min-width:0}
+.칸 label{font-size:13px;color:var(--fg3)}
+.칸 .줄{display:flex;align-items:center;gap:6px}
+.칸 .단{font-size:13px;color:var(--fg4)}
+.칸 .자동값{height:34px;display:flex;align-items:center;font-weight:600;font-variant-numeric:tabular-nums}
+.칸 small{font-size:13px;color:var(--fg4)}
+
+/* 이름 · 값 줄 (실적 비율 · 기준) */
+.값줄{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));border-top:1px solid var(--stroke2)}
+.값줄 > div{padding:12px 20px;border-right:1px solid var(--stroke2);display:flex;flex-direction:column;gap:2px;min-width:0}
+.값줄 > div:last-child{border-right:0}
+.값줄 .이름{font-size:13px;color:var(--fg3);white-space:nowrap}
+.값줄 .값{font-size:17px;font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+.값줄 .갈림{border-right-color:var(--stroke1)}
+.빈글{margin:0;padding:12px 16px;font-size:15px;color:var(--fg3)}
+
+/* 결과 한 줄 */
+.결과{display:grid;grid-template-columns:1.5fr 1.3fr 1fr 1fr 1fr}
+.결과 > div{padding:18px 22px;border-right:1px solid var(--stroke2);display:flex;flex-direction:column;gap:2px;min-width:0}
+.결과 > div:last-child{border-right:0}
+.결과 .이름{font-size:13px;color:var(--fg3)}
+.결과 .값{font-size:23px;font-weight:600;font-variant-numeric:tabular-nums}
+.결과 .큰값{font-size:32px;font-weight:600;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.결과 .풀이{font-size:13px;color:var(--fg3)}
+.진행{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:13px;color:var(--fg3)}
+.진행 .막{flex:1;height:4px;border-radius:2px;background:var(--stroke2);overflow:hidden;max-width:220px}
+.진행 .막 i{display:block;height:100%;background:var(--brand)}
+
+.둘{display:grid;grid-template-columns:1.1fr 1fr;gap:16px;align-items:start}
+.오른{display:flex;flex-direction:column;gap:16px;min-width:0}
+
+/* 바꿔 보기 표 */
+.표틀{overflow-x:auto}
+.바꿈{width:100%;border-collapse:collapse;font-size:15px}
+.바꿈 th{font-size:13px;font-weight:400;color:var(--fg3);text-align:right;padding:10px 12px;border-bottom:1px solid var(--stroke2);white-space:nowrap}
+.바꿈 td{padding:8px 12px;border-bottom:1px solid var(--stroke2);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.바꿈 tr:last-child td{border-bottom:0}
+.바꿈 th:first-child,.바꿈 td:first-child{text-align:left;padding-left:20px;color:var(--fg2)}
+.바꿈 th:last-child,.바꿈 td:last-child{padding-right:20px;width:32%;min-width:140px}
+.바꿈 .칸글{width:128px}
+.바꿈 .단{color:var(--fg4);margin-left:4px;font-size:13px;display:inline-block;min-width:1.2em;text-align:left}
+.바꿈 .변{color:var(--fg3)}
+.바꿈 .변.같음{color:var(--fg4)}
+.바꿈 td.묶음{background:var(--bg2);color:var(--fg3);font-size:13px;padding-top:5px;padding-bottom:5px}
+.끌틀{position:relative;height:20px}
+.눈금{position:absolute;top:14px;width:1px;height:6px;background:var(--fg3);pointer-events:none}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:20px;margin:0;background:transparent;cursor:pointer;display:block}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:linear-gradient(to right,var(--brand) 0 var(--p,0%),var(--stroke1) var(--p,0%) 100%)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;margin-top:-6px;border-radius:50%;background:var(--bg1);border:4px solid var(--brand);box-sizing:border-box}
+input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:var(--stroke1)}
+input[type=range]::-moz-range-progress{height:4px;border-radius:2px;background:var(--brand)}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--bg1);border:4px solid var(--brand);box-sizing:border-box}
+
+/* 그래프 */
+.그래프틀{overflow-x:auto;padding:4px 8px 8px}
+svg text{font-family:var(--font);fill:var(--fg3);font-size:12px}
+.범례{display:flex;gap:12px;font-size:13px;color:var(--fg3);margin-left:auto;flex-wrap:wrap}
+.범례 i{display:inline-block;width:10px;height:10px;margin-right:4px;vertical-align:-1px}
+
+/* 안분표 · 비교 · 항목 — ERP 표 */
+.안분글{margin:0;padding:12px 16px;font-size:15px;color:var(--fg2);border-bottom:1px solid var(--stroke2)}
+.안분글:last-child{border-bottom:0}
+.안분글 b{color:var(--fg1);font-weight:600}
+.안분글 span{display:block}
+.안분글 span+span{margin-top:4px}
+/* 판정 — 해 본 수준 = 초록 점, 못 메움 · 모름 = 흐림(조용하게).
+   과거보다 더 = 주황으로 채운 표시 ▲ 최고 · ▼ 최저 + 넘은 줄 옅은 주황 바탕 · 필요 · 넘은 끝 주황 — '배지는 조용하게' 의 예외(사용자 10/15 "바로 눈에 띄게", 시안 A) */
+.점판{display:inline-flex;align-items:center;gap:6px;color:var(--fg2)}
+.점판::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--fg4)}
+.점판.해봄::before{background:var(--ok)}
+.점판.못,.점판.모름{color:var(--fg4)}
+.판표{display:inline-flex;justify-content:center;min-width:112px;padding:3px 9px;border-radius:var(--r);background:var(--warn);color:#fff;font-size:14px;font-weight:700;line-height:1.35}
+.표 tr.넘음 td{background:color-mix(in srgb,var(--warn) 8%,var(--bg1))}
+.표 tr.넘음 td.필,.끝.넘{color:var(--warn)}
+.끝.넘{font-weight:700}
+.표{width:100%;border-collapse:collapse;font-size:15px}
+.표 th{background:var(--bg4);font-size:13px;font-weight:600;color:var(--fg2);text-align:right;padding:9px 12px;border-bottom:1px solid var(--stroke2);white-space:nowrap}
+.표 td{padding:8px 12px;border-bottom:1px solid var(--stroke2);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.표 th:first-child,.표 td:first-child{text-align:left;padding-left:16px}
+.표 th:last-child,.표 td:last-child{padding-right:16px}
+.표 tbody tr:last-child td{border-bottom:0}
+.표 td.필{font-weight:600}
+.표 .못{color:var(--fg4)}
+.표 tfoot td{font-weight:600;border-top:1px solid var(--stroke1);border-bottom:0}
+.표 tr.묶음머리 td{background:var(--bg2);color:var(--fg3);font-size:13px;font-weight:600}
+.표 th.지금열{color:var(--fg1)}
+.표 .변{font-size:12px;margin-left:6px;color:var(--fg3)}
+.항목표 .칸글{width:100%}
+.항목표 td:first-child{min-width:160px}
+.종류표{display:block;font-size:12px;color:var(--fg4);margin-bottom:2px}
+.빈항목{text-align:center!important;padding:24px!important;color:var(--fg3)}
+.지움{border:0;background:transparent;color:var(--fg4);cursor:pointer;font-size:18px;line-height:1;padding:2px 6px;border-radius:var(--r)}
+.지움:hover{color:var(--danger);background:var(--bg4)}
+
+/* 마케팅비 구성 — 항목마다 다른 색 금지("난잡하다"): ERP 차트색 한 가지 진하기 + 회색, 큰 것부터 진하게 */
+.구성{display:flex;flex-direction:column;gap:8px;padding:12px 16px 4px}
+.구성:empty{display:none}
+.구성막대{display:flex;height:24px;border-radius:var(--r);overflow:hidden;background:var(--bg4)}
+.구성막대 div{display:flex;align-items:center;justify-content:center;font-size:12px;white-space:nowrap;overflow:hidden;min-width:0;padding:0 4px;border-right:1px solid var(--bg1)}
+.구성설명{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px;color:var(--fg2)}
+.구성설명 i{display:inline-block;width:10px;height:10px;margin-right:5px;vertical-align:-1px}
+.층0{background:var(--chart);color:var(--onChart)}
+.층1{background:color-mix(in srgb,var(--chart) 72%,var(--bg1));color:var(--onChart)}
+.층2{background:color-mix(in srgb,var(--chart) 50%,var(--bg1));color:var(--fg1)}
+.층3{background:color-mix(in srgb,var(--chart) 32%,var(--bg1));color:var(--fg1)}
+.층4{background:color-mix(in srgb,var(--chart) 18%,var(--bg1));color:var(--fg1)}
+.층5{background:var(--stroke2);color:var(--fg2)}
+
+/* 용어 ⓘ — ERP 공통_도움 과 같은 꼴(회색 동그라미 i, 올리면 보라 · 어두운 풀이). 표 안 가로 스크롤 상자에서 잘리지 않게 풀이는 화면에 떠 있는 하나 */
+.도움{display:inline-grid;place-items:center;width:18px;height:18px;padding:0;margin-left:4px;border:1px solid var(--stroke1);border-radius:50%;background:var(--bg1);color:var(--fg3);font-size:11px;font-weight:700;line-height:1;cursor:help;vertical-align:middle;flex:none}
+.도움:hover,.도움[aria-expanded="true"]{border-color:var(--고름);color:var(--고름)}
+#풀이창{position:fixed;z-index:60;width:max-content;max-width:min(360px,calc(100vw - 16px));padding:10px 14px;border-radius:var(--r);background:var(--inv);color:var(--onInv);box-shadow:0 8px 16px rgba(0,0,0,.18);font-size:13px;line-height:1.6;pointer-events:none}
+
+/* 월별 실적 — 달이 열인 표 */
+.역대머리{display:flex;flex-direction:column;gap:2px}
+.역대머리 h2{margin:0;font-size:23px;font-weight:600}
+.격자틀{overflow-x:auto;border:1px solid var(--stroke2);border-radius:var(--r);background:var(--bg1)}
+.격자{border-collapse:separate;border-spacing:0;font-size:15px;min-width:100%}
+.격자 th,.격자 td{padding:9px 12px;border-bottom:1px solid var(--stroke2);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.격자 thead th{position:sticky;top:0;background:var(--bg4);color:var(--fg2);font-weight:600;font-size:13px;z-index:2}
+.격자 tbody tr:last-child td{border-bottom:0}
+.격자 th.이름칸,.격자 td.이름칸{text-align:left;position:sticky;left:0;background:var(--bg1);z-index:1;padding-left:16px}
+.격자 thead th.이름칸{background:var(--bg4);z-index:3}
+.격자 td.이름칸{color:var(--fg2)}
+.격자 .진행열{color:var(--fg3)}   /* '진행' 은 결과 줄 진행 막대 꼴(flex · 위 여백) — 같은 이름이면 칸이 내려앉는다 */
+.격자 td.빈{color:var(--fg4)}
+.격자 td.선칸{padding:4px 10px;text-align:left}
+
+/* 잠금 · 오류 줄 · 창 */
+.잠금{position:fixed;inset:0;z-index:50;display:grid;place-items:center;background:var(--bg);padding:16px}
+.잠금상자{width:min(380px,100%);display:flex;flex-direction:column;gap:14px;background:var(--bg1);border:1px solid var(--stroke2);border-radius:var(--r2);padding:28px}
+.잠금상자 h1{margin:0;font-size:23px;font-weight:600}
+.칸이름{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--fg3)}
+.칸이름 input{font-size:16px;height:38px;padding:0 10px;border:1px solid var(--stroke1);border-radius:var(--r);background:var(--bg1);color:var(--fg1)}
+.칸이름 input:focus{outline:none;box-shadow:inset 0 -2px 0 var(--고름)}
+.주단추{height:38px;border:0;border-radius:var(--r);background:var(--주);color:var(--on주);font-weight:600;cursor:pointer}
+.주단추:hover{background:var(--주위)}
+.잠금상자 .오류{min-height:1.3em}
+.잠금상자 .오류:empty{display:block}
+.오류줄{display:flex;align-items:center;gap:12px;padding:8px 14px;border:1px solid var(--danger);border-radius:var(--r);background:var(--bg1);color:var(--danger);font-size:15px}
+.단추줄{display:flex;gap:8px;justify-content:flex-end}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+
+@media (max-width:1100px){.값줄{grid-template-columns:repeat(3,minmax(0,1fr))}.값줄 > div{border-bottom:1px solid var(--stroke2)}}
+@media (max-width:980px){.둘{grid-template-columns:minmax(0,1fr)}.결과{grid-template-columns:1fr 1fr}.결과 > div{border-bottom:1px solid var(--stroke2)}}
+@media (max-width:560px){.결과{grid-template-columns:minmax(0,1fr)}.값줄{grid-template-columns:1fr 1fr}.앱막대{gap:10px 16px;padding:8px 16px}.쪽{padding-inline:16px}}
+</style>
+</head>
+<body>
+<!-- 처음엔 숨김 — 토큰이 없거나 죽었을 때만 잠그기()가 연다(런처로 들어올 때 app.js 가 오기 전 잠깐 비쳤다) -->
+<section id="잠금" class="잠금" hidden>
+  <form id="잠금폼" class="잠금상자">
+    <h1>마케팅 시뮬레이터</h1>
+    <p id="잠금풀이" class="흐" style="margin:0">비밀번호를 넣어 주세요.</p>
+    <label class="칸이름">비밀번호<input id="비번1" type="password" autocomplete="current-password" required></label>
+    <label class="칸이름" id="비번2칸" hidden>한 번 더<input id="비번2" type="password" autocomplete="new-password"></label>
+    <p id="잠금오류" class="오류" role="alert"></p>
+    <button type="submit" class="주단추" id="잠금단추">들어가기</button>
+  </form>
+</section>
+<header class="앱막대">
+  <div class="시뮬메뉴틀"><button type="button" class="이름단추" id="시뮬메뉴" aria-haspopup="true" aria-expanded="false" aria-controls="시뮬목록">마케팅 시뮬레이터 <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg></button><div class="시뮬목록" id="시뮬목록" hidden></div></div>
+  <select id="병원고르기" aria-label="병원"></select>
+  <div class="앱탭" role="tablist" aria-label="화면">
+    <button type="button" role="tab" id="탭-sim" aria-selected="true" aria-controls="판-sim">시뮬레이터</button>
+    <button type="button" role="tab" id="탭-hist" aria-selected="false" aria-controls="판-hist">월별 실적</button>
+  </div>
+  <div class="끝"><button type="button" class="단추 글" id="나가기">나가기</button></div>
+</header>
+<main class="쪽">
+  <div id="오류줄" class="오류줄" role="alert" hidden><span id="오류글"></span><button type="button" class="단추" id="다시시도">다시 시도</button></div>
+  <section id="판-sim" role="tabpanel" aria-labelledby="탭-sim" class="판들">
+    <div class="달줄" id="달줄" role="tablist" aria-label="달"></div>
+    <div class="제목줄" id="제목줄"></div>
+    <div class="안탭" id="안탭" role="tablist" aria-label="안"></div>
+    <p id="안알림" class="오류" role="alert"></p>
+    <div class="빈판" id="빈판" hidden></div>
+
+    <div class="판" id="실적판">
+      <div class="판머리"><h3>실적 숫자 <button type="button" class="도움" data-도움="실적" aria-describedby="풀이창">i</button></h3><span class="흐">그 달 실제로 나온 숫자 — 비율은 저절로 셈, 다음 달들 계획의 기준(평균) · 과거 추세가 된다</span></div>
+      <p class="빈글" id="실적안내" hidden></p>
+      <div class="칸줄" id="실적칸"></div>
+      <div class="값줄" id="실적비율"></div>
+    </div>
+
+    <div class="판" id="기준판">
+      <div class="판머리"><h3 id="기준제목">기준 <button type="button" class="도움" data-도움="기준" aria-describedby="풀이창">i</button></h3><span class="흐" id="기준풀이"></span><span class="끝" id="기간고르기"></span></div>
+      <div id="기준줄"></div>
+    </div>
+    <div class="판" id="결과판"><div class="결과" id="결과"></div></div>
+    <div class="판" id="비교판">
+      <div class="판머리"><h3>과거 실적과 견주기 <button type="button" class="도움" data-도움="비교" aria-describedby="풀이창">i</button></h3><span class="흐">마케팅비(가로) 대비 매출(세로) · 점에 마우스를 올리면 자세히</span><span class="비교범례"><span><i style="background:var(--past)"></i>과거 실적</span><span><i style="height:0;border-radius:0;border-top:2px solid var(--past)"></i>과거 추세</span><span><i style="background:var(--plan)"></i>이 달 안</span></span></div>
+      <div class="그래프틀"><svg id="비교그래프" viewBox="0 0 860 320" width="100%" role="img" aria-label="마케팅비 대비 매출 — 과거 실적 달들 · 과거 추세 · 이 달 안들"></svg></div>
+      <div class="표틀"><table class="표" id="비교표"></table></div>
+    </div>
+    <div class="둘" id="계획둘">
+      <div class="판">
+        <div class="판머리"><h3>바꿔 보기 <button type="button" class="도움" data-도움="바꿔보기" aria-describedby="풀이창">i</button></h3><span class="흐">끌거나 칸에 직접 친다</span><span class="끝" id="바꿈안"></span></div>
+        <div class="표틀"><table class="바꿈" id="바꿈"></table></div>
+        <div class="표아래"><span>눈금 = 기준(실적 평균) · 회색 칸 = 자동</span><button type="button" class="단추 글" data-되돌리기="1">기준 값으로 되돌리기</button></div>
+      </div>
+      <div class="오른">
+        <div class="판">
+          <div class="판머리"><h3>월 매출 <button type="button" class="도움" data-도움="월매출" aria-describedby="풀이창">i</button></h3><span class="범례"><span><i style="background:var(--barReal)"></i>실제 (ERP)</span><span><i style="background:var(--chart)"></i>이 안 예상</span><span><i style="height:0;border-top:1px dashed var(--fg2)"></i>목표</span></span></div>
+          <div class="그래프틀"><svg id="그래프" viewBox="0 0 560 220" width="100%" role="img" aria-label="지난 달들의 실제 매출과 이 안의 예상 매출, 월 목표"></svg></div>
+        </div>
+        <div class="판" id="안분판">
+          <div class="판머리"><h3>목표까지 메우려면 <button type="button" class="도움" data-도움="메우기" aria-describedby="풀이창">i</button></h3><span class="흐">숫자 하나만 바꾼다면 얼마나 — 과거에 해 본 수준인지</span></div>
+          <div id="안분"></div>
+        </div>
+      </div>
+    </div>
+    <div class="판" id="목표판">
+      <div class="판머리"><h3>매출 목표 <button type="button" class="도움" data-도움="목표" aria-describedby="풀이창">i</button></h3><span class="흐">비우면 ERP 월 목표(고른 달)로 견준다</span></div>
+      <div class="칸줄" id="목표칸"></div>
+    </div>
+
+    <div class="판" id="마케팅비판">
+      <div class="판머리"><h3>마케팅비 <button type="button" class="도움" data-도움="마케팅비" aria-describedby="풀이창">i</button></h3><span class="흐" id="마케팅비풀이"></span><span class="끝"><button type="button" class="단추" data-추가="게더링">+ DB 비용</button><button type="button" class="단추" data-추가="비용">+ 그 밖 비용</button></span></div>
+      <div id="구성" class="구성"></div>
+      <div class="표틀"><table class="표 항목표" id="항목표"></table></div>
+    </div>
+  </section>
+  <section id="판-hist" role="tabpanel" aria-labelledby="탭-hist" hidden class="판들">
+    <div class="역대머리"><h2>월별 실적</h2><span class="흐" style="font-size:12px">ERP 상담 기록에서 불러옴 · 병원 전체 · VAT 제외 · 최근 12달 + 진행 중인 달(어제까지)</span></div>
+    <div class="격자틀"><table class="격자" id="격자"></table></div>
+  </section>
+</main>
+<div id="풀이창" role="tooltip" hidden></div>
+<script type="module" src="app.js"></script>
+</body>
+</html>

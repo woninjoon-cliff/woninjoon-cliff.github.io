@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<script src="/sim/demo.js"></script>
+<meta name="robots" content="noindex">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>회원권 손익 시뮬레이터</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="/sim/shared.css">
+<style>
+/* 회원권 손익 시뮬레이터 — 2026-10-14 새로(사용자 "왼쪽 입력 폼 → 결과 카드 → 영향 목록 구조 자체가 별로" → 마케팅 시뮬처럼 답 → 원인 → 손잡이).
+   고른 꼴(보드 https://claude.ai/artifact/CoUMUgKQqcSSiS6MvA28VV): ①A 마케팅 뼈대 · ②C 달마다 쌓이는 이익 · ③B 세 경우 범위 막대 · ④B 폭포 막대 · ⑤B 토네이도 · ⑥B 손잡이 셋 막대 · ⑦B 안 탭.
+   레이아웃: 위 막대 → 안 탭 → 답 한 줄 → 달마다 쌓이는 이익 → 세 경우 → 바꿔 보기 | 이익이 어디서 · 무엇이 바꾸나 → 시술 표.
+   ★ 색 · 크기는 마케팅 시뮬과 같은 값(ERP 옅은 회색 바탕 · 주 단추와 고른 표시는 검정 · 파랑 한 가지는 데이터만 · 글자 16 · 본문 최대 1600) */
+:root{
+  --bg:#f5f5f5; --bg1:#ffffff; --bg2:#fafafa; --bg4:#f0f0f0;
+  --fg1:#242424; --fg2:#424242; --fg3:#616161; --fg4:#707070;
+  --stroke1:#d1d1d1; --stroke2:#e0e0e0;
+  --brand:#2563eb; --주:#1f1f22; --주위:#3a3a3f; --on주:#ffffff; --고름:#1f1f22;
+  --barReal:#c7c7c7; --past:#9e9e9e; --band:rgba(0,0,0,.06);
+  --ok:#0e700e; --warn:#bc4b09; --danger:#b10e1c; --inv:#242424; --onInv:#ffffff;
+  --font:"Pretendard Variable",Pretendard,"Segoe UI","Malgun Gothic","Noto Sans KR",sans-serif;
+  --r:4px; --r2:8px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg1);font-family:var(--font);font-size:16px;line-height:1.5;word-break:keep-all}
+button,input,select{font:inherit;color:inherit}
+.흐{color:var(--fg3)}
+.음{color:var(--danger)}
+
+/* 단추 · 입력 칸 — 마케팅과 같은 꼴 */
+.단추{font-size:15px;height:34px;padding:0 14px;border-radius:var(--r);border:1px solid var(--stroke1);background:var(--bg1);color:var(--fg1);cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;text-decoration:none}
+.단추:hover{background:var(--bg4)}
+.단추.글{border-color:transparent;background:none;color:var(--fg2);padding:0 6px}
+.단추.글:hover{color:var(--fg1);background:var(--bg4)}
+.단추.주{background:var(--주);border-color:var(--주);color:var(--on주);font-weight:600}
+.칸글{font-size:15px;color:var(--fg1);background:var(--bg1);border:1px solid var(--stroke1);border-radius:var(--r);height:34px;padding:0 10px;min-width:0;text-align:right;font-variant-numeric:tabular-nums;width:100%}
+.칸글.이름칸{text-align:left}
+.칸글:focus{outline:none;box-shadow:inset 0 -2px 0 var(--고름)}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--고름);outline-offset:1px}
+
+/* 맨 위 막대 */
+.앱막대{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;align-items:center;gap:20px;background:var(--bg1);border-bottom:1px solid var(--stroke2);padding:0 24px;min-height:56px;flex-wrap:wrap}
+.앱막대 .이름{font-weight:600}
+.앱탭{display:flex;gap:20px;align-self:stretch;align-items:stretch}
+.앱탭 button{background:none;border:0;padding:0;color:var(--fg3);cursor:pointer;box-shadow:inset 0 -2px 0 transparent}
+.앱탭 button[aria-selected="true"]{color:var(--fg1);font-weight:600;box-shadow:inset 0 -2px 0 var(--고름)}
+.앱막대 .끝{margin-left:auto;display:flex;gap:4px;align-items:center}
+
+.쪽{max-width:1600px;margin:0 auto;padding-inline:24px;padding-block:24px 64px;display:flex;flex-direction:column;gap:16px}
+.판{background:var(--bg1);border:1px solid var(--stroke2);border-radius:var(--r);min-width:0}
+.판머리{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid var(--stroke2);flex-wrap:wrap;min-height:54px}
+.판머리 h3{margin:0;font-size:16px;font-weight:600}
+.판머리 .흐{font-size:13px}
+.판머리 .끝{margin-left:auto;display:flex;gap:6px;align-items:center}
+.표아래{display:flex;justify-content:space-between;align-items:center;padding:10px 20px;border-top:1px solid var(--stroke2);font-size:13px;color:var(--fg3);gap:10px;flex-wrap:wrap}
+
+/* ⑦ 안 탭 — 마케팅과 같은 꼴 */
+.안줄{display:flex;align-items:flex-end;gap:12px 20px;flex-wrap:wrap;border-bottom:1px solid var(--stroke2)}
+.안탭{display:flex;gap:18px;align-items:flex-end;flex-wrap:wrap}
+.안탭 .탭{background:none;border:0;padding:6px 0 8px;cursor:pointer;color:var(--fg3);box-shadow:inset 0 -2px 0 transparent;display:flex;flex-direction:column;align-items:flex-start;line-height:1.35;text-align:left}
+.안탭 .탭 small{font-size:12px;color:var(--fg4);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.안탭 .탭[aria-selected="true"]{color:var(--fg1);font-weight:600;box-shadow:inset 0 -2px 0 var(--고름)}
+.안탭 .단추{margin-bottom:6px}
+.이름묶음{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--fg3);padding-bottom:8px}
+.이름묶음 .칸글{width:220px}
+.저장표시{font-size:13px;color:var(--fg3);display:inline-flex;align-items:center;gap:6px;padding-bottom:14px}
+.저장표시::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--fg4)}
+.저장표시.됨::before{background:var(--ok)}
+.저장표시.못{color:var(--danger)}
+.저장표시.못::before{background:var(--danger)}
+.안줄 .끝{margin-left:auto;padding-bottom:6px}
+.알림{margin:0;font-size:13px;color:var(--fg3)}
+.오류{margin:0;font-size:14px;color:var(--danger)}
+.오류:empty{display:none}
+
+/* 답 한 줄 */
+.결과{display:grid;grid-template-columns:1.7fr 1fr 1fr 1fr 1fr}
+.결과 > div{padding:18px 22px;border-right:1px solid var(--stroke2);display:flex;flex-direction:column;gap:2px;min-width:0}
+.결과 > div:last-child{border-right:0}
+.결과 .이름{font-size:13px;color:var(--fg3)}
+.결과 .값{font-size:23px;font-weight:600;font-variant-numeric:tabular-nums}
+.결과 .큰값{font-size:32px;font-weight:700;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.결과 .풀이{font-size:13px;color:var(--fg3)}
+
+/* 그래프 공통 */
+.그래프틀{position:relative;padding:8px 12px 4px}
+svg{display:block}
+svg text{font-family:var(--font);fill:var(--fg3);font-size:12px}
+svg .강{fill:var(--fg1);font-weight:700}
+.그래프글{margin:0;padding:4px 20px 14px;font-size:14px;color:var(--fg2)}
+.그래프글 b{color:var(--fg1)}
+.범례{display:flex;gap:14px;font-size:13px;color:var(--fg3);margin-left:auto;flex-wrap:wrap;align-items:center}
+.범례 i{display:inline-block;width:12px;height:10px;margin-right:5px;vertical-align:-1px;border-radius:2px}
+#풀이창{position:absolute;z-index:6;pointer-events:none;padding:8px 12px;border-radius:var(--r);background:var(--inv);color:var(--onInv);font-size:13px;line-height:1.5;white-space:nowrap;box-shadow:0 8px 16px rgba(0,0,0,.18)}
+#풀이창 b{display:block}
+
+/* ③ 세 경우 — 범위 막대 */
+.경우들{display:grid;grid-template-columns:minmax(180px,260px) minmax(0,1fr) minmax(170px,230px);column-gap:20px;padding:10px 20px 6px;align-items:center}
+.경우들 > .이름{padding:12px 0}
+.경우들 > .이름 b{display:block;font-size:15px}
+.경우들 > .이름 small{display:block;font-size:12px;color:var(--fg4);line-height:1.4}
+.경우들 > .이름.종합 b{color:var(--fg1)}
+.막대칸{position:relative;height:30px}
+.띠{position:absolute;top:10px;height:10px;border-radius:3px;background:var(--barReal)}
+.띠.손해{background:var(--danger);opacity:.8;border-radius:3px 0 0 3px}
+.영선{position:absolute;top:-4px;bottom:-4px;width:0;border-left:1px dashed var(--fg4)}
+.점{position:absolute;top:7px;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:var(--fg1);border:3px solid var(--bg1)}
+.점.종합{background:var(--brand)}
+.경우값{font-size:14px;color:var(--fg2);font-variant-numeric:tabular-nums}
+.경우값 b{color:var(--fg1)}
+.축{grid-column:2;position:relative;height:22px;font-size:12px;color:var(--fg4)}
+.축 span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+
+.둘{display:grid;grid-template-columns:1.15fr 1fr;gap:16px;align-items:start}
+.오른{display:flex;flex-direction:column;gap:16px;min-width:0}
+
+/* 바꿔 보기 — 마케팅 바꿔 보기 꼴 + ⑥ 손잡이 셋 */
+.표틀{overflow-x:auto}
+.바꿈{width:100%;border-collapse:collapse;font-size:15px}
+.바꿈 th{font-size:13px;font-weight:400;color:var(--fg3);text-align:right;padding:10px 12px;border-bottom:1px solid var(--stroke2);white-space:nowrap}
+.바꿈 td{padding:8px 12px;border-bottom:1px solid var(--stroke2);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.바꿈 tr:last-child td{border-bottom:0}
+.바꿈 th:first-child,.바꿈 td:first-child{text-align:left;padding-left:20px;color:var(--fg2);white-space:normal}
+.바꿈 td:first-child small{display:block;font-size:12px;color:var(--fg4);line-height:1.35}
+.바꿈 th:last-child,.바꿈 td:last-child{padding-right:20px;width:34%;min-width:170px}
+.바꿈 .칸글{width:130px}
+.바꿈 .셋칸{display:inline-flex;gap:4px}
+.바꿈 .셋칸 .칸글{width:62px;padding:0 6px}
+.바꿈 .단{color:var(--fg4);margin-left:4px;font-size:13px;display:inline-block;min-width:1.4em;text-align:left}
+.바꿈 td.묶음{background:var(--bg2);color:var(--fg3);font-size:13px;padding-top:6px;padding-bottom:6px;white-space:normal}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:20px;margin:0;background:transparent;cursor:pointer;display:block}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:linear-gradient(to right,var(--brand) 0 var(--p,0%),var(--stroke1) var(--p,0%) 100%)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;margin-top:-6px;border-radius:50%;background:var(--bg1);border:4px solid var(--brand);box-sizing:border-box}
+input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:var(--stroke1)}
+input[type=range]::-moz-range-progress{height:4px;border-radius:2px;background:var(--brand)}
+input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;background:var(--bg1);border:4px solid var(--brand);box-sizing:border-box}
+/* 손잡이 셋 — 겹친 막대 셋, 손잡이만 잡힌다. 최소~최대 사이가 보라, 가운데(가능성 높음)는 꽉 찬 점 */
+.셋끌{position:relative;height:20px}
+.셋끌::before{content:"";position:absolute;left:0;right:0;top:8px;height:4px;border-radius:2px;background:linear-gradient(to right,var(--stroke1) 0 var(--a,0%),var(--brand) var(--a,0%) var(--b,100%),var(--stroke1) var(--b,100%) 100%)}
+.셋끌 input{position:absolute;inset:0;pointer-events:none}
+.셋끌 input::-webkit-slider-runnable-track{background:none}
+.셋끌 input::-moz-range-track{background:none}
+.셋끌 input::-moz-range-progress{background:none}
+.셋끌 input::-webkit-slider-thumb{pointer-events:auto}
+.셋끌 input::-moz-range-thumb{pointer-events:auto}
+.셋끌 input.가운데::-webkit-slider-thumb{background:var(--brand);width:18px;height:18px;margin-top:-7px}
+.셋끌 input.가운데::-moz-range-thumb{background:var(--brand)}
+
+/* ④ 폭포 · ⑤ 토네이도 */
+.폭포틀{padding:10px 20px 6px}
+.토들{display:grid;grid-template-columns:minmax(140px,200px) auto minmax(80px,1fr) auto;column-gap:10px;row-gap:6px;padding:12px 20px 4px;align-items:center}
+.토들 > .이름{font-size:14px;color:var(--fg2);line-height:1.35}
+.토들 > .이름 small{display:block;font-size:12px;color:var(--fg4)}
+.토칸{position:relative;height:30px}
+.토막{position:absolute;top:7px;height:16px;border-radius:2px}
+.토막.아래{background:var(--barReal)}
+.토막.위{background:var(--past)}
+.토글{font-size:12px;color:var(--fg3);white-space:nowrap;font-variant-numeric:tabular-nums}
+.토글.왼{text-align:right}
+.토글 b{color:var(--fg1);font-weight:600}
+.토글 .음{color:var(--danger)}
+.중심{position:absolute;top:-3px;bottom:-3px;width:0;border-left:2px solid var(--fg1)}
+.토아래{grid-column:3;position:relative;height:24px;font-size:12px;color:var(--fg3)}
+.토아래 span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.토아래 span.강{color:var(--fg1);font-weight:700}
+.계산중{padding:14px 20px;font-size:14px;color:var(--fg3)}
+
+/* 시술 표 */
+.표{width:100%;border-collapse:collapse;font-size:15px}
+.표 th{background:var(--bg4);font-size:13px;font-weight:600;color:var(--fg2);text-align:right;padding:9px 7px;border-bottom:1px solid var(--stroke2);white-space:nowrap}
+.표 thead tr:first-child th{background:var(--bg2);font-weight:400;color:var(--fg3)}
+.표 td{padding:8px 7px;border-bottom:1px solid var(--stroke2);text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.표 th:first-child,.표 td:first-child{text-align:left;padding-left:20px;white-space:normal;min-width:170px}
+.표 th:last-child,.표 td:last-child{padding-right:20px}
+.표 tfoot td{font-weight:600;border-top:1px solid var(--stroke1);border-bottom:0}
+.표 .칸글{width:100px;padding:0 8px}
+.표 .칸글.짧{width:68px}
+.표 .근거{display:block;font-size:12px;color:var(--fg4);white-space:normal;line-height:1.35}
+.표 .기록없음{display:block;font-size:12px;color:var(--warn)}
+.표 .음{color:var(--danger)}
+.표 .이름줄{display:flex;gap:6px;align-items:center}
+.표 .이름줄 .칸글{width:180px;text-align:left}
+.입출{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:12px 20px;border-top:1px solid var(--stroke2)}
+.입출 .메시지{font-size:13px;color:var(--fg3)}
+.입출 .메시지.못{color:var(--danger)}
+.입출 .메시지.됨{color:var(--fg2)}
+
+/* 사용 방법 */
+.안내{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.안내 section{padding:18px 22px}
+.안내 h3{margin:0 0 10px;font-size:17px}
+.안내 h4{margin:16px 0 6px;font-size:14px;color:var(--fg3)}
+.안내 ol,.안내 ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;color:var(--fg2);font-size:15px}
+.안내 b{color:var(--fg1)}
+.용어{list-style:none;padding:0!important;gap:4px!important}
+.용어 li{display:grid;grid-template-columns:200px minmax(0,1fr);gap:12px;padding:6px 0;border-bottom:1px solid var(--stroke2);font-size:14px}
+
+.단추줄{display:flex;gap:8px;justify-content:flex-end}
+
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+@media (max-width:1100px){.결과{grid-template-columns:1fr 1fr 1fr}.결과 > div{border-bottom:1px solid var(--stroke2)}.결과 > div:first-child{grid-column:1/-1}}
+@media (max-width:980px){.둘,.안내{grid-template-columns:minmax(0,1fr)}.경우들{grid-template-columns:minmax(0,1fr)}.경우들 > .이름{padding:10px 0 0}.축{grid-column:1}}
+@media (max-width:560px){.토들{grid-template-columns:auto minmax(50px,1fr) auto}.토들 > .이름{grid-column:1/-1;padding-top:6px}.토아래{grid-column:2}.결과{grid-template-columns:minmax(0,1fr)}.앱막대{gap:10px 16px;padding:8px 16px}.쪽{padding-inline:16px}.용어 li{grid-template-columns:minmax(0,1fr)}}
+</style>
+</head>
+<body>
+<header class="앱막대">
+  <div class="시뮬메뉴틀"><button type="button" class="이름단추" id="시뮬메뉴" aria-haspopup="true" aria-expanded="false" aria-controls="시뮬목록">회원권 손익 시뮬레이터 <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg></button><div class="시뮬목록" id="시뮬목록" hidden></div></div>
+  <nav class="앱탭" role="tablist" aria-label="화면">
+    <button type="button" role="tab" id="탭-시뮬" aria-controls="시뮬판" aria-selected="true">시뮬레이터</button>
+    <button type="button" role="tab" id="탭-안내" aria-controls="안내판" aria-selected="false">사용 방법 · 용어</button>
+  </nav>
+  <span class="끝">
+    <a class="단추 글" href="/sim/#membership" id="로그아웃">로그아웃</a>
+  </span>
+</header>
+
+<main class="쪽" id="시뮬판" role="tabpanel" aria-labelledby="탭-시뮬">
+  <div class="안줄">
+    <div class="안탭" id="안탭" role="tablist" aria-label="안"></div>
+    <label class="이름묶음">안 이름<input class="칸글 이름칸" id="안이름" maxlength="60" autocomplete="off"></label>
+    <span class="저장표시" id="저장표시" role="status"></span>
+    <span class="끝"><button type="button" class="단추 글" id="안지우기">이 안 지우기</button></span>
+  </div>
+  <p class="오류" id="오류줄" role="alert"></p>
+  <p class="알림">지금 값은 작동을 보여 주려고 넣은 예시입니다 — 불확실한 가정과 비용은 실제 자료로 확인한 값으로 바꿔 넣어 주세요. 금액은 모두 VAT 제외.</p>
+
+  <section class="판" aria-label="답">
+    <div class="결과">
+      <div><span class="이름" id="답이름">실제로 늘어나는 이익 · 종합</span><b class="큰값" id="답이익">–</b><span class="풀이" id="답범위"></span></div>
+      <div><span class="이름">도입해서 손해 볼 확률</span><b class="값" id="답손해">–</b><span class="풀이" id="답손해풀이"></span></div>
+      <div><span class="이름">회원권에서 남는 돈</span><b class="값" id="답남는">–</b><span class="풀이">가입비 + 회원가 매출 − 원가 · 비용</span></div>
+      <div><span class="이름">기존 고객에게서 줄어드는 이익</span><b class="값" id="답줄어">–</b><span class="풀이">회원권 없어도 판매가로 받았을 시술</span></div>
+      <div><span class="이름">월평균 시술 건수</span><b class="값" id="답건수">–</b><span class="풀이" id="답건수풀이"></span></div>
+    </div>
+  </section>
+
+  <section class="판">
+    <div class="판머리"><h3>달마다 쌓이는 이익 · 종합</h3><span class="흐">가입비로 먼저 받고, 회원이 시술을 받을수록 할인 · 줄어드는 이익만큼 깎인다</span>
+      <span class="범례"><span><i style="background:var(--brand);height:3px"></i>평균</span><span><i style="background:var(--band);border:1px solid var(--stroke1)"></i>하위 5% ~ 상위 5%</span></span></div>
+    <div class="그래프틀" id="쌓임"></div>
+    <p class="그래프글" id="쌓임글"></p>
+  </section>
+
+  <section class="판">
+    <div class="판머리"><h3>세 경우 견주기</h3><span class="흐">방문 · 가정은 같고 시술을 고르는 기준만 다르다 · 띠 = 하위 5% ~ 상위 5%, 점 = 평균, 점선 = 0원</span></div>
+    <div class="경우들" id="경우들"></div>
+  </section>
+
+  <div class="둘">
+    <section class="판">
+      <div class="판머리"><h3>바꿔 보기</h3><span class="흐">끌거나 칸에 직접 친다 — 바꾸면 바로 다시 계산</span></div>
+      <div class="표틀"><table class="바꿈" id="바꿈"></table></div>
+      <div class="표아래"><span id="상태" role="status">계산 준비 중</span><button type="button" class="단추 글" id="되돌리기">처음 값으로 되돌리기</button></div>
+    </section>
+    <div class="오른">
+      <section class="판">
+        <div class="판머리"><h3>이익이 어디서 나오나 · 종합 평균</h3></div>
+        <div class="폭포틀" id="폭포"></div>
+      </section>
+      <section class="판">
+        <div class="판머리"><h3>무엇이 결과를 가장 크게 바꾸나</h3><span class="흐">가정 하나를 최소 · 최대로 두고 다시 계산한 평균 — 막대가 긴 가정이 위</span></div>
+        <div id="토네이도"><p class="계산중">계산 중</p></div>
+      </section>
+    </div>
+  </div>
+
+  <section class="판" id="menu">
+    <div class="판머리"><h3>시술 메뉴와 이용 결과</h3><span class="흐">금액은 VAT 제외 · 기간 한도를 비우면 무제한 · 바꾸면 바로 다시 계산</span></div>
+    <div class="표틀"><table class="표">
+      <thead>
+        <tr><th></th><th colspan="8"></th><th colspan="3">1인 평균 이용 (건)</th><th colspan="3">회원 1명당 남는 돈 (원)</th></tr>
+        <tr><th>시술 · 근거</th><th>기존 판매가</th><th>회원가</th><th>할인율</th><th>원가</th><th>건당 손익</th><th>기간 한도</th><th>실적 건수</th><th>실적 비중</th><th>종합</th><th>실적</th><th>할인 위주</th><th>종합</th><th>실적</th><th>할인 위주</th></tr>
+      </thead>
+      <tbody id="items"></tbody>
+      <tfoot><tr><td>시술 합계</td><td colspan="6"></td><td id="w-sum"></td><td>100%</td><td id="u0-sum"></td><td id="u1-sum"></td><td id="u2-sum"></td><td id="c0-sum"></td><td id="c1-sum"></td><td id="c2-sum"></td></tr></tfoot>
+    </table></div>
+    <div class="입출">
+      <button type="button" class="단추" id="addItem">+ 시술 추가</button>
+      <button type="button" class="단추" id="dlTpl">양식 내려받기 (엑셀)</button>
+      <button type="button" class="단추" id="ulBtn">엑셀 · CSV 올리기</button>
+      <input type="file" id="ulFile" accept=".xlsx,.xls,.csv" hidden>
+      <span class="메시지" id="ioMsg" role="status"></span>
+    </div>
+  </section>
+</main>
+
+<main class="쪽" id="안내판" role="tabpanel" aria-labelledby="탭-안내" hidden>
+  <div class="안내">
+    <section class="판">
+      <h3>쓰는 순서</h3>
+      <ol>
+        <li>맨 위 <b>안 탭</b>에서 안을 고릅니다. [+ 다른 안]은 지금 안을 그대로 복사해 새 안을 만듭니다. 바꾼 값은 <b>저절로 저장</b>됩니다.</li>
+        <li><b>바꿔 보기</b>에서 회원 수 · 기간 · 가입비를 넣습니다. 끌거나 칸에 직접 치면 바로 다시 계산됩니다.</li>
+        <li>정확히 모르는 가정은 <b>손잡이 셋</b>(최소 · 가능성 높음 · 최대)으로 범위를 정합니다. 확실하면 셋을 같은 값으로 둡니다.</li>
+        <li>맨 아래 <b>시술 표</b>에서 판매가 · 회원가 · 원가 · 기간 한도를 확인합니다. VAT 포함 금액은 1.1로 나눠 넣습니다. 엑셀 양식으로 내려받아 고친 뒤 올려도 됩니다.</li>
+        <li>수수료 · 모집비 · 운영비 · 고정비가 0이면 그 비용이 없는 것으로 계산되어 이익이 크게 나옵니다.</li>
+        <li>같은 값이면 늘 같은 결과가 나옵니다. 믿을 만한지 보려면 반복 횟수를 500에서 2,000으로 올려 보고, 숫자가 거의 같으면 충분합니다.</li>
+      </ol>
+      <h3 style="margin-top:22px">결과 읽는 법</h3>
+      <ol>
+        <li><b>답 한 줄</b> — 종합 결과의 실제로 늘어나는 이익(평균)과 하위 5% ~ 상위 5%. 아래쪽이 음수면 손해가 날 수도 있습니다.</li>
+        <li><b>달마다 쌓이는 이익</b> — 가입비로 먼저 들어온 돈이 기간 동안 얼마나 깎여 끝에 얼마 남는지. 띠가 0원 아래로 내려가는 달이 있으면 그때부터 손해 쪽입니다.</li>
+        <li><b>세 경우 견주기</b> — 종합(현실 추정) · 원가표 실적 분포(좋은 쪽 끝) · 할인 큰 시술 위주(나쁜 쪽 끝).</li>
+        <li><b>이익이 어디서 나오나</b> — 회원권에서 남는 돈에서 기존 고객에게서 줄어드는 이익을 빼면 실제로 늘어나는 이익입니다.</li>
+        <li><b>무엇이 결과를 가장 크게 바꾸나</b> — 위에 있는 가정부터 실제 값을 확인합니다.</li>
+      </ol>
+    </section>
+    <section class="판">
+      <h3>용어</h3>
+      <h4>값</h4>
+      <ul class="용어">
+        <li><b>회원 수</b><span>가입하는 회원 수</span></li>
+        <li><b>회원 기간</b><span>회원권 유효 기간(개월). 기간 한도와 방문 횟수의 기준</span></li>
+        <li><b>가입비</b><span>가입할 때 한 번 받는 금액(VAT 제외)</span></li>
+        <li><b>최소 · 가능성 높음 · 최대</b><span>정확히 모르는 값을 범위로 적는 방식. 반복할 때마다 범위에서 뽑고, 셋이 같으면 그 값으로 고정</span></li>
+        <li><b>평균 월 방문 횟수</b><span>회원이 한 달에 평균 몇 번 오는지. 0.6이면 10달에 6번</span></li>
+        <li><b>기존 고객 비율</b><span>회원 중 원래 우리 병원 고객이었던 사람의 비율</span></li>
+        <li><b>회원권 없어도 받았을 시술 비율</b><span>기존 고객이 회원으로 받은 시술 중, 회원권이 없었어도 판매가를 내고 받았을 비율</span></li>
+        <li><b>할인 큰 시술 위주 회원 비율</b><span>회원 중 할인 큰 시술 위주로 고르는 사람의 비율. 종합 결과에 쓰임</span></li>
+        <li><b>방문당 평균 시술 수</b><span>한 번 올 때 받는 시술 개수</span></li>
+        <li><b>회원 간 이용 편차</b><span>회원마다 오는 빈도가 얼마나 다른지. 0이면 모두 같은 빈도</span></li>
+        <li><b>할인 큰 시술 선호도</b><span>같은 횟수 안에서 할인 큰 시술을 얼마나 더 고르는지. 0이면 실적 비율 그대로</span></li>
+        <li><b>결제 수수료율</b><span>카드 수수료 등 결제할 때 빠지는 비율</span></li>
+        <li><b>모집 · 판매비</b><span>회원 한 명을 가입시키는 데 드는 비용(광고, 상담 인센티브)</span></li>
+        <li><b>시술 1건당 운영비</b><span>원가 외에 시술마다 드는 비용(인건비, 소모품, 장비 사용분)</span></li>
+        <li><b>기간 고정비 총액</b><span>회원 수와 상관없이 기간 동안 드는 비용</span></li>
+        <li><b>반복 횟수</b><span>가상의 회원 기간을 몇 번 돌릴지</span></li>
+      </ul>
+      <h4>결과</h4>
+      <ul class="용어">
+        <li><b>종합</b><span>일부 회원은 할인 큰 시술 위주로, 나머지는 실적 분포대로 고른다고 본 현실 추정</span></li>
+        <li><b>원가표 실적 분포</b><span>모든 회원이 지금 고객들과 같은 비율로 고르는 경우(좋은 쪽 끝)</span></li>
+        <li><b>할인 큰 시술 위주</b><span>모든 회원이 할인 폭이 큰 시술을 더 많이 고르는 경우(나쁜 쪽 끝)</span></li>
+        <li><b>실제로 늘어나는 이익</b><span>회원권 도입으로 병원 이익이 실제로 늘어나는 금액 = 남는 돈 − 줄어드는 이익</span></li>
+        <li><b>회원권에서 남는 돈</b><span>가입비와 회원가 매출에서 회원에게 들어간 비용을 뺀 금액</span></li>
+        <li><b>기존 고객에게서 줄어드는 이익</b><span>판매가를 내던 기존 고객이 회원가로 받으면서 놓친 이익</span></li>
+        <li><b>하위 5% ~ 상위 5%</b><span>결과가 열에 아홉은 들어오는 범위</span></li>
+        <li><b>도입해서 손해 볼 확률</b><span>반복 결과 중 이익이 0원 미만인 비율</span></li>
+        <li><b>월평균 시술 건수</b><span>회원 전체가 한 달에 받는 시술 수와 9월 전체 대비 비율</span></li>
+      </ul>
+      <h4>시술 표</h4>
+      <ul class="용어">
+        <li><b>기존 판매가</b><span>회원권 없이 결제했을 가격(원가표 8 · 9월 실판매 평균)</span></li>
+        <li><b>할인율 · 건당 손익</b><span>판매가 대비 깎아 주는 비율 · 시술 1건에서 남는 돈</span></li>
+        <li><b>원가</b><span>약품 · 팁 등 시술에 직접 들어가는 매입 비용(VAT 제외)</span></li>
+        <li><b>기간 한도</b><span>회원 1명이 기간 동안 회원가로 받을 수 있는 최대 횟수. 빈칸이면 무제한</span></li>
+        <li><b>실적 건수 · 비중</b><span>8 · 9월 실제 시술 건수와 그 비율 — 회원이 시술을 고르는 비중의 기준</span></li>
+      </ul>
+    </section>
+  </div>
+</main>
+
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>
