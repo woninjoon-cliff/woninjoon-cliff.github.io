@@ -25,22 +25,26 @@ CASES = [
    '/img/erp-1.webp', '재고 현황 화면 — 품목별 재고·유효기간·평가금액', '실제 운영 화면 · 금액과 품목은 흐리게 처리',
    '구매·재고·원가 데이터가 스프레드시트 6종에 흩어져 입력 누락과 마감 이후 소급 변경이 반복됐습니다.',
    '입고·사용·조정을 분리하고, 입고 LOT 순서대로 차감하는 선입선출(FIFO) 원가 기준을 정했습니다. 사용 부서는 품목과 수량만 입력하고 단가·원가는 자동 계산되도록 사내 웹 시스템으로 옮겼습니다.',
-   '월 마감(재고·원가 집계) 반나절 → 1시간 이내. 업무 화면 30개를 실제 업무에 사용 중입니다.', None),
+   '월 마감(재고·원가 집계) 반나절 → 1시간 이내. 업무 화면 30개를 실제 업무에 사용 중입니다.', None,
+   ('반나절 → 1시간 이내', '월 마감(재고·원가 집계) 소요 시간')),
   ('02', '재고 이관과 월 마감 절차', '비비셀랩 · 2026', ['재고실사', '데이터 검증'],
    '/img/erp-2.webp', '재고 실사 화면 — 장부 수량과 실사 수량 비교', '실제 운영 화면 · 금액과 품목은 흐리게 처리',
    '새 체계로 옮기려면 기초 재고의 수량과 단가를 확정해야 했지만, 단가 자료와 재고 자료의 품목명 표기가 서로 달랐습니다.',
    '두 자료를 대조표로 만들어 품목명을 하나씩 검증하고, 전 품목 수량을 대조한 뒤 전환했습니다. 월 마감 수치는 고정하고, 실사 차이는 조정 내역과 사유를 남기도록 규칙을 정했습니다.',
-   '약 110개 품목, 재고자산 약 6.8억 원을 기준일 기준으로 상시 확인합니다. 마감 이후 소급 변경을 차단했습니다.', None),
+   '약 110개 품목, 재고자산 약 6.8억 원을 기준일 기준으로 상시 확인합니다. 마감 이후 소급 변경을 차단했습니다.', None,
+   ('110개 품목 · 6.8억 원', '전 품목 대조 후 전환, 마감 후 소급 변경 차단')),
   ('03', '회원권 가격 손익 검토', '비비셀랩 · 2026.10', ['손익분석', '가격결정'],
    '/sim/shots/3.webp', '회원권 손익 검토 화면 — 순증 이익, 손실 확률, 하위·상위 5% 구간', '공개 데모 화면 · 숫자는 연습용 임의 값',
    '신규 회원권 가격안을 엑셀로 수기 검토하느라 며칠씩 걸렸고, 여러 안을 나란히 비교하기 어려웠습니다.',
    '기존 고객 매출 잠식분을 반영해, 가격안별 순증 이익·손실 확률·하위/상위 5% 구간을 500회 시뮬레이션으로 계산하는 검토 도구를 만들었습니다.',
-   '복수 가격안 비교 결과를 최종 회원권 가격·구성 결정에 활용했습니다. 시나리오별 손익분기점을 바로 확인합니다.', ('/sim/', '데모 보기 (비밀번호 demo)')),
+   '복수 가격안 비교 결과를 최종 회원권 가격·구성 결정에 활용했습니다. 시나리오별 손익분기점을 바로 확인합니다.', ('/sim/', '데모 보기 (비밀번호 demo)'),
+   ('수일 → 즉시', '가격안 손익 검토 시간, 최종 가격·구성 결정에 활용')),
   ('04', '월 마케팅 예산 계획', '비비셀랩 · 2026.10', ['예산관리', 'KPI'],
    '/sim/shots/2.webp', '마케팅 계획 화면 — 마케팅비 대비 매출 추세선 위 이번 달 안 비교', '공개 데모 화면 · 숫자는 연습용 임의 값',
    '월 마케팅 예산안을 엑셀로 수기 검토해, 예산 변화가 매출에 주는 영향을 안별로 비교하기 어려웠습니다.',
    '채널별 DB 비용·CPA, 전환율, 상담단가로 월 예상 매출을 산출하고 과거 실적 추세·ROAS와 비교했습니다. 목표 매출에 필요한 CPA·DB·전환율도 역산하도록 정리했습니다.',
-   '예산안별 예상 매출과 손익분기점을 바로 비교해 월 마케팅 계획 수립에 사용합니다.', ('/sim/', '데모 보기 (비밀번호 demo)')),
+   '예산안별 예상 매출과 손익분기점을 바로 비교해 월 마케팅 계획 수립에 사용합니다.', ('/sim/', '데모 보기 (비밀번호 demo)'),
+   ('목표 매출 역산', '목표 달성에 필요한 CPA·DB·전환율을 바로 산출')),
 ]
 
 MORE = [
@@ -50,7 +54,7 @@ MORE = [
 ]
 
 def case(c):
-    no, title, meta, tags, img, alt, cap, bg, act, res, link = c
+    no, title, meta, tags, img, alt, cap, bg, act, res, link, kpi = c
     tags_html = ''.join(f'<li>{t}</li>' for t in tags)
     link_html = f'<a class="more" href="{link[0]}" target="_blank" rel="noopener">{link[1]} ↗</a>' if link else ''
     return f'''<article class="case" id="case-{no}">
@@ -60,6 +64,7 @@ def case(c):
     <h3>{title}</h3>
     <p class="meta">{meta}</p>
     <ul class="tags">{tags_html}</ul>
+    <div class="kpi"><b>{kpi[0]}</b><span>{kpi[1]}</span></div>
     <dl>
       <dt>배경</dt><dd>{bg}</dd>
       <dt>조치</dt><dd>{act}</dd>
@@ -70,13 +75,13 @@ def case(c):
 </article>'''
 
 CSS = '''
-:root{--bg:#f7f7f5;--panel:#ebeae6;--card:#fff;--ink:#111;--text:#3a3a38;--muted:#7a7a76;--line:#dfded9;
+:root{--bg:#f7f7f5;--panel:#ebeae6;--card:#fff;--ink:#111;--text:#3a3a38;--muted:#7a7a76;--line:#dfded9;--accent:#1f4e79;--accent-bg:#e8eef5;
   --sans:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;color-scheme:light}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:72px}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.7;word-break:keep-all;overflow-wrap:anywhere;-webkit-font-smoothing:antialiased}
-a{color:var(--ink);text-underline-offset:3px}
+a{color:var(--accent);text-underline-offset:3px}
 :focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 h1,h2,h3,p,dl,dd,ul,figure{margin:0}
 ul{padding:0;list-style:none}
@@ -86,7 +91,7 @@ h1,h2,h3{color:var(--ink);letter-spacing:-.02em}
 .top{position:sticky;top:0;z-index:5;background:rgba(247,247,245,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
 .top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;height:60px}
 .me{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--ink)}
-.chip{font-size:13px;font-weight:500;color:var(--text);background:var(--panel);border-radius:6px;padding:3px 8px}
+.chip{font-size:13px;font-weight:600;color:var(--accent);background:var(--accent-bg);border-radius:6px;padding:3px 8px}
 .top nav{display:flex;gap:24px;font-size:14px}
 .top nav a{color:var(--muted);text-decoration:none}
 .top nav a:hover{color:var(--ink)}
@@ -95,21 +100,22 @@ h1,h2,h3{color:var(--ink);letter-spacing:-.02em}
 .hero h1{font-size:clamp(44px,7vw,72px);font-weight:700;line-height:1.05}
 .hero .lead{font-size:clamp(18px,2.2vw,22px);color:var(--text);max-width:34ch;margin-top:20px;line-height:1.55}
 .facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0 24px;margin-top:64px}
-.facts div{border-top:1px solid var(--ink);padding-top:12px}
+.facts div{border-top:2px solid var(--accent);padding-top:12px}
 .facts dt{font-size:13px;color:var(--muted)}
-.facts dd{font-size:clamp(22px,2.6vw,30px);font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.02em;margin-top:2px}
+.facts dd{font-size:clamp(20px,2.4vw,28px);font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;letter-spacing:-.02em;margin-top:2px}
 
 section{padding:88px 0 0}
 .sh{display:flex;align-items:baseline;justify-content:space-between;gap:16px;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:40px}
 .sh h2{font-size:15px;font-weight:700}
+.sh h2::before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--accent);margin-right:8px;vertical-align:1px}
 .sh span{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
 
 .cases{display:grid;gap:72px}
 .case{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:40px;align-items:start}
-.shot{background:var(--panel);border-radius:14px;padding:28px 28px 16px}
+.shot{background:linear-gradient(160deg,var(--accent-bg),var(--panel));border-radius:14px;padding:28px 28px 16px}
 .shot img{display:block;width:100%;height:auto;border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.06);background:var(--card)}
 .shot figcaption{font-size:12.5px;color:var(--muted);margin-top:12px}
-.body .no{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.body .no{font-size:13px;font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums}
 .body h3{font-size:clamp(22px,2.4vw,28px);font-weight:700;line-height:1.3;margin-top:4px}
 .body .meta{font-size:14px;color:var(--muted);margin-top:6px}
 .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
@@ -118,6 +124,9 @@ section{padding:88px 0 0}
 .body dt{font-size:13px;font-weight:700;color:var(--ink)}
 .body dd{font-size:15px;margin-top:2px}
 .body dd.res{color:var(--ink);font-weight:600}
+.kpi{margin-top:20px;background:var(--accent-bg);border-radius:10px;padding:14px 16px}
+.kpi b{display:block;font-size:clamp(22px,2.4vw,28px);color:var(--accent);letter-spacing:-.02em;line-height:1.3;font-variant-numeric:tabular-nums}
+.kpi span{display:block;font-size:13.5px;color:var(--text);margin-top:2px}
 .more{display:inline-block;margin-top:20px;font-size:14px;font-weight:600}
 
 .grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
@@ -131,7 +140,7 @@ section{padding:88px 0 0}
 .job:first-child{border-top:0;padding-top:0}
 .job .when{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
 .job .when span{display:block;font-size:13px}
-.job .org b{display:block;color:var(--ink);font-size:17px}
+.job .org b{display:block;color:var(--accent);font-size:17px}
 .job .org span{display:block;font-size:14px;color:var(--muted)}
 .job ul li{position:relative;padding-left:14px;font-size:15px;margin:2px 0}
 .job ul li::before{content:"";position:absolute;left:0;top:.72em;width:5px;height:5px;border-radius:50%;background:var(--line)}
@@ -181,10 +190,10 @@ def page(v):
   <h1>원인준</h1>
   <p class="lead">구매·재고·원가 데이터를 기준으로 관리하는 경영지원 담당자입니다. 흩어진 기록을 절차로 정리해, 발주와 마감이 같은 기준으로 돌아가게 만듭니다.</p>
   <dl class="facts">
-    <div><dt>총 경력</dt><dd>{v["total"]}</dd></div>
-    <div><dt>관리 품목</dt><dd>약 110개</dd></div>
-    <div><dt>재고자산</dt><dd>약 6.8억 원</dd></div>
+    <div><dt>월 마감 소요</dt><dd>반나절 → 1시간</dd></div>
+    <div><dt>관리 재고자산</dt><dd>약 6.8억 원</dd></div>
     <div><dt>구매 거래처</dt><dd>42개사</dd></div>
+    <div><dt>총 경력</dt><dd>{v["total"]}</dd></div>
   </dl>
 </header>
 
