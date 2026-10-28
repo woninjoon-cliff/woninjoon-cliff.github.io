@@ -45,11 +45,24 @@ CASES = [
    '채널별 DB 비용·CPA, 전환율, 상담단가로 월 예상 매출을 산출하고 과거 실적 추세·ROAS와 비교했습니다. 목표 매출에 필요한 CPA·DB·전환율도 역산하도록 정리했습니다.',
    '예산안별 예상 매출과 손익분기점을 바로 비교해 월 마케팅 계획 수립에 사용합니다.', ('/sim/', '데모 보기 (비밀번호 demo)'),
    ('목표 매출 역산', '목표 달성에 필요한 CPA·DB·전환율을 바로 산출')),
+  ('05', '병원 통합 매출 대시보드', '비비셀랩 · 2026.10', ['매출분석', '데이터 통합', '정산'],
+   '/img/ysf-0.webp', '병원 통합 대시보드 개요 화면 — 병원별 상담 매출·티켓팅율·객단가', '실제 운영 화면 · 숫자는 바꾼 뒤 흐리게, 병원·업체명은 흐리게 처리',
+   '병원마다 매출 자료가 ERP·외부 차트·CSV 등 서로 다른 곳에 있어, 여러 병원 실적을 같은 기준으로 비교하기 어려웠습니다.',
+   'ERP 자료는 바로 연결하고, 외부 차트·CSV 자료는 올리기 양식으로 받아 하나의 기준(VAT 제외 금액, 상담 건수, 티켓팅율, 객단가)으로 맞췄습니다. 기간·경로·국가별로 거르고, 월별 실적·손익계산서·정산(청구·입금·미수) 화면을 붙였습니다.',
+   '4개 병원 실적을 한 화면에서 같은 기준으로 비교합니다. 4개 병원·업체 실무자들이 사용합니다.', None,
+   ('4개 병원 · 한 화면', '출처가 다른 매출 자료를 같은 기준으로 통합')),
+]
+
+SYSTEMS = [
+  ('/img/erp-0.webp', '클리닉 운영 ERP', '상담·시술·구매·재고·원가·통계를 한곳에서 관리합니다. 업무 화면 30개.', '2026.08 – 운영 중', '#case-01'),
+  ('/sim/shots/1.webp', '손익 시뮬레이터', '마케팅 예산안과 회원권 가격안의 손익을 비교합니다. 공개 데모 있음.', '2026.10 – 운영 중', '#case-03'),
+  ('/img/ysf-0.webp', '병원 통합 대시보드', '4개 병원 매출·실적을 한 화면에서 비교하고 손익·정산을 관리합니다.', '2026.10 – 운영 중', '#case-05'),
 ]
 
 MORE = [
   ('구매·결제 조건 관리', '비비셀랩', '거래처 42개사와 단가·납기·결제조건을 조율하고, 월 2억 원대 대금결제 일정과 업체별 미수금을 관리합니다.'),
   ('부서 운영비 관리', '비비셀랩', '간호·상담·코디·공용 4개 부서 운영비를 계정과목별로 나눠 집행하고 잔액을 관리합니다.'),
+  ('개발 도구 회사 지원 전환', '비비셀랩', '개인 비용으로 쓰던 개발 도구(Claude)가 업무 효과를 인정받아, 회사가 Claude Max 구독을 지원하게 됐습니다.'),
   ('시험 데이터 관리', '삼영에스앤씨', '압력센서 DV 과제에서 기록 양식을 통일해 100회 이상 반복 시험을 비교, 오차율 목표 ±1% 대비 ±0.8%를 달성했습니다.'),
 ]
 
@@ -129,7 +142,17 @@ section{padding:88px 0 0}
 .kpi span{display:block;font-size:13.5px;color:var(--text);margin-top:2px}
 .more{display:inline-block;margin-top:20px;font-size:14px;font-weight:600}
 
-.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.sys{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.sys a{display:block;text-decoration:none;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.sys a:hover{border-color:var(--accent)}
+.sys .thumb{background:linear-gradient(160deg,var(--accent-bg),var(--panel));padding:14px 14px 0}
+.sys img{display:block;width:100%;height:auto;aspect-ratio:1400/658;object-fit:cover;object-position:top left;border-radius:6px 6px 0 0}
+.sys .t{padding:16px 18px 18px}
+.sys b{display:block;font-size:17px;color:var(--ink)}
+.sys p{font-size:14.5px;margin-top:6px}
+.sys span{display:block;font-size:13px;color:var(--accent);font-weight:600;margin-top:10px}
+.sysnote{margin-top:16px;font-size:14px;color:var(--muted)}
 .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 22px}
 .card b{display:block;color:var(--ink);font-size:16px}
 .card span{display:block;font-size:13px;color:var(--muted);margin-top:2px}
@@ -155,7 +178,8 @@ footer{margin:104px 0 48px;padding-top:20px;border-top:1px solid var(--line);dis
 @media (max-width:900px){
   .case{grid-template-columns:1fr;gap:24px}
   .job{grid-template-columns:1fr;gap:2px}
-  .cred,.grid3{grid-template-columns:1fr}
+  .cred,.sys{grid-template-columns:1fr}
+  .grid3{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media (max-width:640px){
   .top nav{display:none}
@@ -163,11 +187,13 @@ footer{margin:104px 0 48px;padding-top:20px;border-top:1px solid var(--line);dis
   .facts{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 16px;margin-top:40px}
   .shot{padding:14px 14px 10px;border-radius:10px}
   section{padding-top:64px}
+  .grid3{grid-template-columns:1fr}
 }
 '''
 
 def page(v):
     cases = '\n'.join(case(c) for c in CASES)
+    systems = '\n'.join(f'<a href="{h}"><div class="thumb"><img src="{i}" alt="{t} 화면" loading="lazy" width="1400" height="658"></div><div class="t"><b>{t}</b><p>{d}</p><span>{m}</span></div></a>' for i, t, d, m, h in SYSTEMS)
     more = '\n'.join(f'<div class="card"><b>{t}</b><span>{o}</span><p>{d}</p></div>' for t, o, d in MORE)
     return f'''<!doctype html>
 <html lang="ko">
@@ -182,7 +208,7 @@ def page(v):
 <body>
 <div class="top"><div class="wrap">
   <div class="me">원인준 <span class="chip">구매 · 경영지원</span></div>
-  <nav aria-label="섹션"><a href="#work">업무 사례</a><a href="#career">경력</a><a href="#cred">자격·교육</a></nav>
+  <nav aria-label="섹션"><a href="#systems">업무 시스템</a><a href="#work">업무 사례</a><a href="#career">경력</a><a href="#cred">자격·교육</a></nav>
 </div></div>
 
 <main class="wrap">
@@ -191,14 +217,22 @@ def page(v):
   <p class="lead">구매·재고·원가 데이터를 기준으로 관리하는 경영지원 담당자입니다. 흩어진 기록을 절차로 정리해, 발주와 마감이 같은 기준으로 돌아가게 만듭니다.</p>
   <dl class="facts">
     <div><dt>월 마감 소요</dt><dd>반나절 → 1시간</dd></div>
+    <div><dt>직접 만든 업무 시스템</dt><dd>3개 · 약 20명 사용</dd></div>
     <div><dt>관리 재고자산</dt><dd>약 6.8억 원</dd></div>
     <div><dt>구매 거래처</dt><dd>42개사</dd></div>
-    <div><dt>총 경력</dt><dd>{v["total"]}</dd></div>
   </dl>
 </header>
 
+<section id="systems">
+  <div class="sh"><h2>직접 만든 업무 시스템</h2><span>03</span></div>
+  <div class="sys">
+{systems}
+  </div>
+  <p class="sysnote">기획 · DB 설계 · 개발 · 배포 단독 · 4개 병원·업체 실무자 약 20명 사용 · Supabase(PostgreSQL) · Cloudflare Workers</p>
+</section>
+
 <section id="work">
-  <div class="sh"><h2>업무 사례</h2><span>04</span></div>
+  <div class="sh"><h2>업무 사례</h2><span>05</span></div>
   <div class="cases">
 {cases}
   </div>
@@ -221,6 +255,7 @@ def page(v):
     <li>2개 브랜드 의약품·의료소모품 발주부터 정산까지 관리, 거래처 42개사 단가·납기·결제조건 조율</li>
     <li>재고표·원가표·구매총무 시트 6종 설계, 재고·원가 관리 체계 구축(업무 사례 01–02)</li>
     <li>마케팅비 구조·CPA·ROAS 지표 정리와 월 마케팅 계획, 회원권 가격 손익 검토(업무 사례 03–04)</li>
+    <li>4개 병원 매출을 통합한 대시보드 구축, 월별 실적·손익·정산 관리(업무 사례 05)</li>
     <li>제주 신규 병원 오픈 준비 — 판매가 산정·손익 예측·구매 셋업(2026.10~)</li>
   </ul>
 </li>{v["transys"]}
@@ -273,7 +308,7 @@ def page(v):
       <li>국립부산기계공업고 메카트로닉스 졸업<span>2019.02</span></li>
     </ul>
     <h3 style="margin-top:24px">업무 도구</h3>
-    <p style="font-size:15px">Excel · Google Sheets, ERP 운영, Apps Script · SQL</p></div>
+    <p style="font-size:15px">Excel · Google Sheets, Supabase(PostgreSQL) · SQL, Cloudflare Workers, Apps Script</p></div>
   </div>
 </section>
 
