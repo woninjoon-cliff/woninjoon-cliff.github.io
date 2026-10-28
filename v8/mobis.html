@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>원인준 포트폴리오</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{--bg:#f7f7f5;--panel:#ebeae6;--card:#fff;--ink:#111;--text:#3a3a38;--muted:#7a7a76;--line:#dfded9;
+  --sans:"Pretendard Variable",Pretendard,"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;color-scheme:light}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.7;word-break:keep-all;overflow-wrap:anywhere;-webkit-font-smoothing:antialiased}
+a{color:var(--ink);text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+h1,h2,h3,p,dl,dd,ul,figure{margin:0}
+ul{padding:0;list-style:none}
+h1,h2,h3{color:var(--ink);letter-spacing:-.02em}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+
+.top{position:sticky;top:0;z-index:5;background:rgba(247,247,245,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;height:60px}
+.me{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--ink)}
+.chip{font-size:13px;font-weight:500;color:var(--text);background:var(--panel);border-radius:6px;padding:3px 8px}
+.top nav{display:flex;gap:24px;font-size:14px}
+.top nav a{color:var(--muted);text-decoration:none}
+.top nav a:hover{color:var(--ink)}
+
+.hero{padding:104px 0 64px}
+.hero h1{font-size:clamp(44px,7vw,72px);font-weight:700;line-height:1.05}
+.hero .lead{font-size:clamp(18px,2.2vw,22px);color:var(--text);max-width:34ch;margin-top:20px;line-height:1.55}
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0 24px;margin-top:64px}
+.facts div{border-top:1px solid var(--ink);padding-top:12px}
+.facts dt{font-size:13px;color:var(--muted)}
+.facts dd{font-size:clamp(22px,2.6vw,30px);font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.02em;margin-top:2px}
+
+section{padding:88px 0 0}
+.sh{display:flex;align-items:baseline;justify-content:space-between;gap:16px;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:40px}
+.sh h2{font-size:15px;font-weight:700}
+.sh span{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+
+.cases{display:grid;gap:72px}
+.case{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:40px;align-items:start}
+.shot{background:var(--panel);border-radius:14px;padding:28px 28px 16px}
+.shot img{display:block;width:100%;height:auto;border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.06);background:var(--card)}
+.shot figcaption{font-size:12.5px;color:var(--muted);margin-top:12px}
+.body .no{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.body h3{font-size:clamp(22px,2.4vw,28px);font-weight:700;line-height:1.3;margin-top:4px}
+.body .meta{font-size:14px;color:var(--muted);margin-top:6px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.tags li{font-size:12.5px;color:var(--text);background:var(--panel);border-radius:6px;padding:2px 8px}
+.body dl{margin-top:24px;display:grid;gap:14px}
+.body dt{font-size:13px;font-weight:700;color:var(--ink)}
+.body dd{font-size:15px;margin-top:2px}
+.body dd.res{color:var(--ink);font-weight:600}
+.more{display:inline-block;margin-top:20px;font-size:14px;font-weight:600}
+
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 22px}
+.card b{display:block;color:var(--ink);font-size:16px}
+.card span{display:block;font-size:13px;color:var(--muted);margin-top:2px}
+.card p{font-size:14.5px;margin-top:12px}
+
+.jobs{display:grid}
+.job{display:grid;grid-template-columns:150px 240px minmax(0,1fr);gap:4px 32px;padding:24px 0;border-top:1px solid var(--line)}
+.job:first-child{border-top:0;padding-top:0}
+.job .when{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.job .when span{display:block;font-size:13px}
+.job .org b{display:block;color:var(--ink);font-size:17px}
+.job .org span{display:block;font-size:14px;color:var(--muted)}
+.job ul li{position:relative;padding-left:14px;font-size:15px;margin:2px 0}
+.job ul li::before{content:"";position:absolute;left:0;top:.72em;width:5px;height:5px;border-radius:50%;background:var(--line)}
+
+.cred{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px 40px}
+.cred h3{font-size:14px;margin-bottom:10px}
+.cred li{display:flex;justify-content:space-between;gap:12px;font-size:15px;padding:7px 0;border-bottom:1px solid var(--line)}
+.cred li span{color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+
+footer{margin:104px 0 48px;padding-top:20px;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 24px;font-size:14px;color:var(--muted)}
+
+@media (max-width:900px){
+  .case{grid-template-columns:1fr;gap:24px}
+  .job{grid-template-columns:1fr;gap:2px}
+  .cred,.grid3{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .top nav{display:none}
+  .hero{padding:64px 0 40px}
+  .facts{grid-template-columns:repeat(2,minmax(0,1fr));gap:24px 16px;margin-top:40px}
+  .shot{padding:14px 14px 10px;border-radius:10px}
+  section{padding-top:64px}
+}
+</style>
+</head>
+<body>
+<div class="top"><div class="wrap">
+  <div class="me">원인준 <span class="chip">구매 · 경영지원</span></div>
+  <nav aria-label="섹션"><a href="#work">업무 사례</a><a href="#career">경력</a><a href="#cred">자격·교육</a></nav>
+</div></div>
+
+<main class="wrap">
+<header class="hero">
+  <h1>원인준</h1>
+  <p class="lead">구매·재고·원가 데이터를 기준으로 관리하는 경영지원 담당자입니다. 흩어진 기록을 절차로 정리해, 발주와 마감이 같은 기준으로 돌아가게 만듭니다.</p>
+  <dl class="facts">
+    <div><dt>총 경력</dt><dd>5년 9개월</dd></div>
+    <div><dt>관리 품목</dt><dd>약 110개</dd></div>
+    <div><dt>재고자산</dt><dd>약 6.8억 원</dd></div>
+    <div><dt>구매 거래처</dt><dd>42개사</dd></div>
+  </dl>
+</header>
+
+<section id="work">
+  <div class="sh"><h2>업무 사례</h2><span>04</span></div>
+  <div class="cases">
+<article class="case" id="case-01">
+  <figure class="shot"><img src="/img/erp-1.webp" alt="재고 현황 화면 — 품목별 재고·유효기간·평가금액" loading="lazy" width="1400" height="658"><figcaption>실제 운영 화면 · 금액과 품목은 흐리게 처리</figcaption></figure>
+  <div class="body">
+    <p class="no">01</p>
+    <h3>재고·원가 관리 체계 구축</h3>
+    <p class="meta">비비셀랩 · 2026.08 – 운영 중</p>
+    <ul class="tags"><li>재고관리</li><li>원가관리</li><li>업무표준화</li></ul>
+    <dl>
+      <dt>배경</dt><dd>구매·재고·원가 데이터가 스프레드시트 6종에 흩어져 입력 누락과 마감 이후 소급 변경이 반복됐습니다.</dd>
+      <dt>조치</dt><dd>입고·사용·조정을 분리하고, 입고 LOT 순서대로 차감하는 선입선출(FIFO) 원가 기준을 정했습니다. 사용 부서는 품목과 수량만 입력하고 단가·원가는 자동 계산되도록 사내 웹 시스템으로 옮겼습니다.</dd>
+      <dt>결과</dt><dd class="res">월 마감(재고·원가 집계) 반나절 → 1시간 이내. 업무 화면 30개를 실제 업무에 사용 중입니다.</dd>
+    </dl>
+    
+  </div>
+</article>
+<article class="case" id="case-02">
+  <figure class="shot"><img src="/img/erp-2.webp" alt="재고 실사 화면 — 장부 수량과 실사 수량 비교" loading="lazy" width="1400" height="658"><figcaption>실제 운영 화면 · 금액과 품목은 흐리게 처리</figcaption></figure>
+  <div class="body">
+    <p class="no">02</p>
+    <h3>재고 이관과 월 마감 절차</h3>
+    <p class="meta">비비셀랩 · 2026</p>
+    <ul class="tags"><li>재고실사</li><li>데이터 검증</li></ul>
+    <dl>
+      <dt>배경</dt><dd>새 체계로 옮기려면 기초 재고의 수량과 단가를 확정해야 했지만, 단가 자료와 재고 자료의 품목명 표기가 서로 달랐습니다.</dd>
+      <dt>조치</dt><dd>두 자료를 대조표로 만들어 품목명을 하나씩 검증하고, 전 품목 수량을 대조한 뒤 전환했습니다. 월 마감 수치는 고정하고, 실사 차이는 조정 내역과 사유를 남기도록 규칙을 정했습니다.</dd>
+      <dt>결과</dt><dd class="res">약 110개 품목, 재고자산 약 6.8억 원을 기준일 기준으로 상시 확인합니다. 마감 이후 소급 변경을 차단했습니다.</dd>
+    </dl>
+    
+  </div>
+</article>
+<article class="case" id="case-03">
+  <figure class="shot"><img src="/sim/shots/3.webp" alt="회원권 손익 검토 화면 — 순증 이익, 손실 확률, 하위·상위 5% 구간" loading="lazy" width="1400" height="658"><figcaption>공개 데모 화면 · 숫자는 연습용 임의 값</figcaption></figure>
+  <div class="body">
+    <p class="no">03</p>
+    <h3>회원권 가격 손익 검토</h3>
+    <p class="meta">비비셀랩 · 2026.10</p>
+    <ul class="tags"><li>손익분석</li><li>가격결정</li></ul>
+    <dl>
+      <dt>배경</dt><dd>신규 회원권 가격안을 엑셀로 수기 검토하느라 며칠씩 걸렸고, 여러 안을 나란히 비교하기 어려웠습니다.</dd>
+      <dt>조치</dt><dd>기존 고객 매출 잠식분을 반영해, 가격안별 순증 이익·손실 확률·하위/상위 5% 구간을 500회 시뮬레이션으로 계산하는 검토 도구를 만들었습니다.</dd>
+      <dt>결과</dt><dd class="res">복수 가격안 비교 결과를 최종 회원권 가격·구성 결정에 활용했습니다. 시나리오별 손익분기점을 바로 확인합니다.</dd>
+    </dl>
+    <a class="more" href="/sim/" target="_blank" rel="noopener">데모 보기 (비밀번호 demo) ↗</a>
+  </div>
+</article>
+<article class="case" id="case-04">
+  <figure class="shot"><img src="/sim/shots/2.webp" alt="마케팅 계획 화면 — 마케팅비 대비 매출 추세선 위 이번 달 안 비교" loading="lazy" width="1400" height="658"><figcaption>공개 데모 화면 · 숫자는 연습용 임의 값</figcaption></figure>
+  <div class="body">
+    <p class="no">04</p>
+    <h3>월 마케팅 예산 계획</h3>
+    <p class="meta">비비셀랩 · 2026.10</p>
+    <ul class="tags"><li>예산관리</li><li>KPI</li></ul>
+    <dl>
+      <dt>배경</dt><dd>월 마케팅 예산안을 엑셀로 수기 검토해, 예산 변화가 매출에 주는 영향을 안별로 비교하기 어려웠습니다.</dd>
+      <dt>조치</dt><dd>채널별 DB 비용·CPA, 전환율, 상담단가로 월 예상 매출을 산출하고 과거 실적 추세·ROAS와 비교했습니다. 목표 매출에 필요한 CPA·DB·전환율도 역산하도록 정리했습니다.</dd>
+      <dt>결과</dt><dd class="res">예산안별 예상 매출과 손익분기점을 바로 비교해 월 마케팅 계획 수립에 사용합니다.</dd>
+    </dl>
+    <a class="more" href="/sim/" target="_blank" rel="noopener">데모 보기 (비밀번호 demo) ↗</a>
+  </div>
+</article>
+  </div>
+</section>
+
+<section id="more">
+  <div class="sh"><h2>그 외 성과</h2></div>
+  <div class="grid3">
+<div class="card"><b>구매·결제 조건 관리</b><span>비비셀랩</span><p>거래처 42개사와 단가·납기·결제조건을 조율하고, 월 2억 원대 대금결제 일정과 업체별 미수금을 관리합니다.</p></div>
+<div class="card"><b>부서 운영비 관리</b><span>비비셀랩</span><p>간호·상담·코디·공용 4개 부서 운영비를 계정과목별로 나눠 집행하고 잔액을 관리합니다.</p></div>
+<div class="card"><b>시험 데이터 관리</b><span>삼영에스앤씨</span><p>압력센서 DV 과제에서 기록 양식을 통일해 100회 이상 반복 시험을 비교, 오차율 목표 ±1% 대비 ±0.8%를 달성했습니다.</p></div>
+  </div>
+</section>
+
+<section id="career">
+  <div class="sh"><h2>경력</h2><span>총 5년 9개월</span></div>
+  <ul class="jobs">
+<li class="job">
+  <div class="when">2026.04 – 재직 중</div>
+  <div class="org"><b>비비셀랩</b><span>경영지원팀 · 주임</span></div>
+  <ul>
+    <li>2개 브랜드 의약품·의료소모품 발주부터 정산까지 관리, 거래처 42개사 단가·납기·결제조건 조율</li>
+    <li>재고표·원가표·구매총무 시트 6종 설계, 재고·원가 관리 체계 구축(업무 사례 01–02)</li>
+    <li>마케팅비 구조·CPA·ROAS 지표 정리와 월 마케팅 계획, 회원권 가격 손익 검토(업무 사례 03–04)</li>
+    <li>제주 신규 병원 오픈 준비 — 판매가 산정·손익 예측·구매 셋업(2026.10~)</li>
+  </ul>
+</li>
+<li class="job">
+  <div class="when">2024.12 – 2025.03<span>4개월</span></div>
+  <div class="org"><b>에이스원텍</b><span>기반기술팀 · 연구원</span></div>
+  <ul>
+    <li>LG전자 H&amp;A 가전 제품 분해·조립 후 기능별 시험, 선행 연구 실험·기술 검토 지원</li>
+    <li>시료·지그를 개체 단위로 구분해 보관·관리, 시험 데이터 취합·정리</li>
+  </ul>
+</li>
+<li class="job">
+  <div class="when">2023.05 – 2023.12<span>8개월</span></div>
+  <div class="org"><b>삼영에스앤씨</b><span>개발팀 · 연구원</span></div>
+  <ul>
+    <li>자동차 압력센서 DV 과제에서 오차율 목표 ±1% 대비 ±0.8% 달성 — 100회 이상 반복 시험, 필터 회로 개선</li>
+    <li>발주처 규격 원본을 분석해 센서 사양·장착 위치별 시험 프로파일 추출</li>
+    <li>시제품 품질 검사, 시험 일정·보고서·자료 관리, 연구소 자재 구매 요청·경비 처리</li>
+  </ul>
+</li>
+<li class="job">
+  <div class="when">2019.01 – 2023.04<span>4년 4개월</span></div>
+  <div class="org"><b>코코도르</b><span>지원팀 · 총무 / 자재 / 생산관리</span></div>
+  <ul>
+    <li>자재 입고 검수, 입고 성적서 작성·ERP 등록, 자재 이력·불출 관리</li>
+    <li>신규 공장 운영 — 생산 현황·계획 수립, 소모품 구매·납기 조율, 도급 인력 운영 지원</li>
+    <li>시설물·차량·비품 관리, 외주 정기 점검 대응, 신규 입사자 온보딩</li>
+  </ul>
+</li>
+  </ul>
+</section>
+
+<section id="cred">
+  <div class="sh"><h2>자격 · 교육 · 수상</h2></div>
+  <div class="cred">
+    <div><h3>자격증</h3><ul>
+      <li>설비보전기능사<span>2017.06</span></li>
+      <li>전자기기기능사<span>2018.07</span></li>
+      <li>ITQ 한글<span>2016.06</span></li>
+      <li>ITQ 파워포인트<span>2016.09</span></li>
+      <li>2종 보통 운전면허<span>2020.01</span></li>
+    </ul></div>
+    <div><h3>교육 이수</h3><ul>
+      <li><a href="https://academy.claude.com/verify/cd109b59ad026776def41e369c31b56b" target="_blank" rel="noopener">AI Fluency (Anthropic)</a><span>2026.10</span></li>
+      <li><a href="https://academy.claude.com/verify/d6596eb7bd1eb2b179df774e6ab7ba93" target="_blank" rel="noopener">Claude 101 (Anthropic)</a><span>2026.10</span></li>
+      <li><a href="https://academy.claude.com/verify/9f59776536b85355bf82c92cf711ae12" target="_blank" rel="noopener">Claude Code in Action (Anthropic)</a><span>2026.10</span></li>
+    </ul></div>
+    <div><h3>수상 · 학력</h3><ul>
+      <li>융합과학 프로젝트 작품 전시회 최우수상<span>2018.11</span></li>
+      <li>국립부산기계공업고 메카트로닉스 졸업<span>2019.02</span></li>
+    </ul>
+    <h3 style="margin-top:24px">업무 도구</h3>
+    <p style="font-size:15px">Excel · Google Sheets, ERP 운영, Apps Script · SQL</p></div>
+  </div>
+</section>
+
+<footer><span>원인준 · 2026.10 갱신</span><a href="https://nosy-mustard-524.notion.site/3d058e2decc1816ca872f389678bc478" target="_blank" rel="noopener">전체 작업 내역(Notion) ↗</a></footer>
+</main>
+</body>
+</html>
