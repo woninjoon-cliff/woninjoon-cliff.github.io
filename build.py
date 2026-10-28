@@ -240,6 +240,8 @@ def page(v):
     </div>
     <div><h3>자격증</h3>
       <ul class="dots"><li>설비보전기능사 · 2017.06</li><li>전자기기기능사 · 2018.07</li><li>ITQ 한글 · 2016.06</li><li>ITQ 파워포인트 · 2016.09</li><li>2종 보통 운전면허 · 2020.01</li></ul>
+      <h3 style="margin-top:16px">교육 이수</h3>
+      <ul class="dots"><li><a href="https://academy.claude.com/verify/cd109b59ad026776def41e369c31b56b" target="_blank" rel="noopener">Anthropic AI Fluency 수료</a> · 2026.10</li></ul>
     </div>
   </div>
 </section>
